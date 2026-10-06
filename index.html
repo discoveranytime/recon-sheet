@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reconstitution Sheet — Interactive Dose-to-Units Reference</title>
+<script>try{var __t=localStorage.getItem('recon-theme');if(__t==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}</script>
+<style>
+:root{
+  --bg:#0c1016; --bg2:#111722; --card:#151d2a; --card2:#1a2333;
+  --line:#263143; --line2:#33405266;
+  --text:#e9eef6; --muted:#9fb0c6; --faint:#6b7c93;
+  --accent:#22d3ee; --accent-dim:#22d3ee33;
+  --red:#ea9999; --orange:#f5c99b; --yellow:#fff2cc; --green:#bfe3c9;
+  --ink:#141414;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{animation:none!important; transition:none!important} }
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:16px; line-height:1.6;
+  background-image:radial-gradient(1100px 500px at 15% -5%, #16233a 0%, transparent 60%),
+                   radial-gradient(900px 480px at 90% 10%, #12283a 0%, transparent 55%);
+  background-attachment:fixed;
+}
+.wrap{max-width:1500px; margin:0 auto; padding:0 32px; position:relative; z-index:1}
+#bg-dots{position:fixed; inset:0; z-index:0; pointer-events:none}
+/* ---------- sidebar ---------- */
+.sidebar{
+  position:fixed; top:0; left:0; bottom:0; width:248px; z-index:100;
+  background:rgba(12,16,22,.94); backdrop-filter:blur(10px);
+  border-right:1px solid var(--line);
+  display:flex; flex-direction:column; gap:6px; padding:22px 16px;
+  transition:transform .32s ease, background-color .45s ease, border-color .45s ease;
+}
+.side-brand{font-weight:800; font-size:16px; letter-spacing:.2px; display:flex; align-items:center; gap:10px; padding:4px 8px 18px}
+.side-brand .drop{
+  width:30px; height:30px; border-radius:9px; display:inline-flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg,#2dd4bf,#22d3ee); font-size:16px; flex:0 0 auto;
+}
+.sidenav{display:flex; flex-direction:column; gap:4px}
+.sidenav a{
+  display:flex; align-items:center; gap:12px; color:var(--muted); text-decoration:none;
+  font-size:14px; font-weight:600; padding:10px 12px; border-radius:10px; border:1px solid transparent;
+}
+.sidenav a .n{
+  font-size:11px; font-weight:800; color:var(--faint); background:#ffffff0c;
+  border-radius:6px; padding:3px 7px; flex:0 0 auto;
+}
+.sidenav a:hover{color:var(--text); background:#ffffff0c}
+.sidenav a.active{color:var(--text); background:#22d3ee14; border-color:#22d3ee44}
+.sidenav a.active .n{color:var(--accent); background:#22d3ee22}
+.side-foot{margin-top:auto; display:flex; align-items:center; gap:10px; padding:8px}
+.side-foot span{font-size:12.5px; color:var(--faint); font-weight:600}
+/* sidebar reading progress */
+.side-progress{padding:16px 10px 6px; margin-top:12px; border-top:1px solid var(--line)}
+.sp-head{display:flex; justify-content:space-between; align-items:baseline; font-size:11px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; color:var(--faint); margin-bottom:8px}
+.sp-head #sidePct{color:var(--accent); font-size:13px; letter-spacing:0}
+.sp-bar{height:6px; border-radius:3px; background:#ffffff10; overflow:hidden}
+.sp-bar #sideFill{display:block; height:100%; width:0; background:linear-gradient(90deg,#2dd4bf,#22d3ee); border-radius:3px}
+[data-theme="light"] .sp-bar{background:rgba(20,35,60,.09)}
+.menu-btn{
+  position:fixed; top:12px; left:12px; z-index:190; width:42px; height:42px; border-radius:12px;
+  background:rgba(12,16,22,.85); backdrop-filter:blur(8px); border:1px solid var(--line);
+  color:var(--text); font-size:18px; cursor:pointer; display:none; align-items:center; justify-content:center;
+}
+.side-backdrop{position:fixed; inset:0; background:#000a; z-index:150; opacity:0; pointer-events:none; transition:opacity .3s ease}
+body.side-open .side-backdrop{opacity:1; pointer-events:auto}
+@media (min-width:901px){
+  body{padding-left:248px}
+  .menu-btn,.side-backdrop{display:none!important}
+}
+@media (max-width:900px){
+  .sidebar{transform:translateX(-106%); width:282px; z-index:200}
+  body.side-open .sidebar{transform:none}
+  .menu-btn{display:inline-flex}
+}
+/* ---------- hero ---------- */
+.hero{padding:56px 0 30px}
+.kicker{
+  display:inline-block; font-size:12.5px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase;
+  color:var(--accent); border:1px solid var(--accent-dim); background:#0e749018;
+  padding:7px 14px; border-radius:999px; margin-bottom:18px;
+}
+h1{font-size:clamp(30px,4.4vw,50px); line-height:1.12; margin:0 0 14px; letter-spacing:-.5px}
+h1 .grad{background:linear-gradient(92deg,#5eead4,#22d3ee 45%,#2dd4bf); -webkit-background-clip:text; background-clip:text; color:transparent}
+.lede{color:var(--muted); font-size:17.5px; max-width:70ch; margin:0}
+.howto{margin:4px 0 6px}
+.howto p{font-size:15.5px}
+.howto p strong{color:var(--text)}
+/* ---------- collapsible rating quiz ---------- */
+.quiz{padding:0; overflow:hidden}
+.quiz-toggle{
+  width:100%; display:flex; align-items:center; justify-content:space-between; gap:14px;
+  background:none; border:none; color:var(--text); font:inherit;
+  font-weight:800; font-size:17px; padding:22px 24px; cursor:pointer; text-align:left;
+}
+.quiz-toggle .q{flex:1}
+.quiz-chevron{
+  flex:0 0 34px; height:34px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg,#2dd4bf,#22d3ee); color:#06121c; font-size:22px; font-weight:800; line-height:1;
+  transition:transform .25s;
+}
+.quiz.open .quiz-chevron{transform:rotate(45deg)}
+.quiz-body{display:grid; grid-template-rows:0fr; transition:grid-template-rows .32s ease}
+.quiz.open .quiz-body{grid-template-rows:1fr}
+@media (prefers-reduced-motion: reduce){.quiz-body{transition:none}}
+.quiz-inner{overflow:hidden; min-height:0}
+.quiz-options{display:grid; gap:10px; padding:2px 24px 4px}
+.quiz-options button{
+  display:flex; align-items:center; gap:12px; text-align:left;
+  background:#ffffff08; border:1px solid var(--line); color:var(--text);
+  padding:13px 18px; border-radius:12px; font:inherit; font-size:15.5px; font-weight:700; cursor:pointer;
+}
+.quiz-options button small{color:var(--muted); font-weight:500; font-size:13.5px}
+.quiz-options button:hover{border-color:var(--accent)}
+.quiz-options button.picked{background:#22d3ee1f; border-color:var(--accent); box-shadow:0 0 0 1px var(--accent)}
+.quiz-thanks{padding:4px 24px 24px; color:var(--muted); font-size:14.5px; margin:12px 0 0}
+.quiz-thanks strong{color:var(--text)}
+/* ---------- quiz results ---------- */
+.quiz-results{padding:2px 24px 24px}
+.qr-head{font-size:13.5px; color:var(--muted); margin:0 0 10px}
+.qr-head .qr-note{opacity:.85}
+#qrTotal{font-weight:700; color:var(--text)}
+.qr-row{display:grid; grid-template-columns:158px 1fr 118px; gap:12px; align-items:center; padding:7px 0; font-size:14.5px}
+.qr-label{font-weight:700; white-space:nowrap}
+.qr-bar{height:8px; border-radius:4px; background:#ffffff12; overflow:hidden}
+.qr-bar span{display:block; height:100%; width:0; background:linear-gradient(90deg,#2dd4bf,#22d3ee); border-radius:4px; transition:width .6s ease}
+.qr-pct{color:var(--muted); font-size:13px; text-align:right; white-space:nowrap}
+[data-theme="light"] .qr-bar{background:rgba(20,35,60,.09)}
+/* ---------- scroll progress bar ---------- */
+#progress{position:fixed; top:0; left:0; right:0; height:3px; z-index:300; pointer-events:none}
+#progressFill{height:100%; width:0%; background:linear-gradient(90deg,#2dd4bf,#22d3ee); border-radius:0 3px 3px 0}
+/* ---------- theme toggle ---------- */
+.theme-btn{
+  width:40px; height:40px; border-radius:50%; border:1px solid var(--line); flex:0 0 auto;
+  background:#ffffff0c; color:var(--text); font-size:18px; cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center;
+  transition:opacity .5s ease, transform .25s ease, background-color .4s ease, border-color .4s ease;
+}
+.theme-btn:hover{transform:scale(1.1)}
+.theme-btn.dim{opacity:.32}
+.theme-btn.dim:hover,.theme-btn.dim:focus-visible{opacity:1}
+/* ---------- smooth theme switching ---------- */
+body,.sidebar,.card,.leg,.step,.note,.frow,.tablewrap,.formula,.step .math,.calc-out,
+table.data thead th,table.data tbody th.rowhead,select,input[type=number],
+.quiz-options button,.toast,.pill,.exchip,.kicker,.quiz-toggle{
+  transition:background-color .45s ease,color .45s ease,border-color .45s ease;
+}
+/* ---------- light theme ---------- */
+[data-theme="light"]{
+  --bg:#edf1f7; --bg2:#e0e7f2; --card:#ffffff; --card2:#f1f5fa;
+  --line:#d2dae7; --text:#17222f; --muted:#4d5d74; --faint:#8494ab;
+}
+[data-theme="light"] body{
+  background-image:radial-gradient(1100px 500px at 15% -5%, #d8e6f6 0%, transparent 60%),
+                   radial-gradient(900px 480px at 90% 10%, #d5ebf3 0%, transparent 55%);
+}
+[data-theme="light"] .sidebar{background:rgba(237,241,247,.94)}
+[data-theme="light"] h1 .grad{background:linear-gradient(92deg,#0d9488,#0891b2 50%,#0f766e); -webkit-background-clip:text; background-clip:text; color:transparent}
+[data-theme="light"] .tablewrap{background:#edf1f8}
+[data-theme="light"] table.data thead th{background:#dbe3f0; color:#4d5d74}
+[data-theme="light"] table.data tbody th.rowhead{background:#e6ecf5}
+[data-theme="light"] .formula,[data-theme="light"] .step .math,[data-theme="light"] .calc-out{background:#edf1f8}
+[data-theme="light"] select,[data-theme="light"] input[type=number]{background:#edf1f8}
+[data-theme="light"] .leg{background:#edf1f8 padding-box, var(--gb,linear-gradient(135deg,#2563eb,#7dd3fc,#a78bfa,#1e40af)) border-box}
+[data-theme="light"] .toast{background:#ffffff}
+[data-theme="light"] .kicker{background:#22d3ee14}
+[data-theme="light"] .pill,[data-theme="light"] .exchip,[data-theme="light"] .quiz-options button,[data-theme="light"] .theme-btn{background:rgba(20,35,60,.05)}
+[data-theme="light"] .sidenav a:hover{background:rgba(20,35,60,.06)}
+[data-theme="light"] .quiz-options button.picked{background:#22d3ee26}
+/* ---------- chapters ---------- */
+section.chapter{padding:44px 0 10px; scroll-margin-top:16px}
+.ch-head{display:flex; align-items:baseline; gap:14px; margin-bottom:6px; flex-wrap:wrap}
+.ch-num{
+  font-size:12px; font-weight:800; letter-spacing:1.4px; color:#06121c;
+  background:linear-gradient(135deg,#2dd4bf,#22d3ee); border-radius:8px; padding:5px 10px;
+}
+h2{font-size:clamp(22px,2.6vw,30px); margin:0; letter-spacing:-.3px}
+.ch-sub{color:var(--muted); margin:2px 0 22px; max-width:78ch}
+/* ---------- cards & grids ---------- */
+.grid{display:grid; gap:16px}
+.grid.c2{grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}
+.grid.c3{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.grid.c4{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.card{
+  background:linear-gradient(180deg,var(--card),var(--bg2));
+  border:1px solid var(--line); border-radius:var(--radius); padding:22px 22px;
+}
+.card h3{margin:0 0 8px; font-size:16.5px}
+.card p{margin:8px 0; color:var(--muted); font-size:14.5px}
+.card p strong{color:var(--text)}
+.formula{
+  font-size:19px; font-weight:700; background:#0a0f16; border:1px dashed #22d3ee55;
+  border-radius:12px; padding:16px 18px; margin:12px 0; text-align:center; letter-spacing:.2px;
+}
+.formula .op{color:var(--accent)}
+.exchips{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+.exchip{font-size:13px; background:#ffffff0c; border:1px solid var(--line); padding:6px 12px; border-radius:999px; color:var(--muted)}
+.exchip b{color:var(--text)}
+/* legend */
+.legend{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-top:6px}
+.leg{display:flex; gap:12px; align-items:flex-start; background:#0a0f16; border:1px solid var(--line); border-radius:12px; padding:14px 16px}
+.swatch{flex:0 0 34px; height:34px; border-radius:9px; border:1px solid #00000055; margin-top:2px}
+.swatch.r{background:var(--red)} .swatch.o{background:var(--orange)}
+.swatch.y{background:var(--yellow)} .swatch.g{background:var(--green)}
+.leg b{display:block; font-size:14.5px}
+.leg span{font-size:13px; color:var(--muted); line-height:1.5}
+/* ---------- smooth vial-switch animation ---------- */
+#vialTableWrap, #finderResults{transition:opacity .2s ease, transform .2s ease}
+#vialTableWrap.swapping, #finderResults.swapping{opacity:0; transform:translateY(10px)}
+@media (prefers-reduced-motion: reduce){
+  #vialTableWrap, #finderResults{transition:none}
+}
+/* ---------- pills / controls ---------- */
+.pills{display:flex; flex-wrap:wrap; gap:8px; margin:4px 0 18px}
+.pill{
+  cursor:pointer; border:1px solid var(--line); background:#ffffff08; color:var(--muted);
+  font-size:14px; font-weight:700; padding:9px 15px; border-radius:999px; transition:all .15s;
+}
+.pill:hover{color:var(--text); border-color:#22d3ee66}
+.pill.on{background:var(--accent); border-color:var(--accent); color:#06121c}
+.controls{display:flex; gap:14px; flex-wrap:wrap; align-items:center; margin:0 0 16px}
+.control label{font-size:13px; color:var(--muted); font-weight:600; display:block; margin-bottom:6px}
+select, input[type=number]{
+  background:#0a0f16; color:var(--text); border:1px solid var(--line); border-radius:10px;
+  padding:10px 12px; font-size:14.5px; font-family:inherit; min-width:170px;
+}
+select:focus, input[type=number]:focus{outline:2px solid #22d3ee66; border-color:var(--accent)}
+button.btn{
+  cursor:pointer; background:var(--accent); color:#06121c; border:none; font-weight:800;
+  padding:11px 20px; border-radius:10px; font-size:14.5px;
+}
+button.btn:hover{filter:brightness(1.1)}
+button.ghost{background:#ffffff0c; color:var(--text); border:1px solid var(--line)}
+.hintline{font-size:13px; color:var(--faint); margin:0 0 14px}
+/* ---------- data table ---------- */
+.tablewrap{
+  overflow:auto; border:1px solid var(--line); border-radius:var(--radius);
+  background:#0a0f16; max-width:100%;
+}
+table.data{border-collapse:separate; border-spacing:0; width:max-content; min-width:100%}
+table.data th, table.data td{border-bottom:1px solid #ffffff10; border-right:1px solid #ffffff08; padding:0}
+table.data thead th{
+  position:sticky; top:0; z-index:5; background:#1b2637; color:var(--muted);
+  font-size:11.5px; font-weight:700; padding:10px 6px; min-width:52px; white-space:nowrap;
+}
+table.data thead th.rowhead{left:0; z-index:6; text-align:left; padding-left:16px}
+table.data tbody th.rowhead{
+  position:sticky; left:0; z-index:4; background:#141c29; text-align:left;
+  padding:10px 14px; min-width:172px; vertical-align:middle;
+}
+.rowhead .bac{font-size:14px; font-weight:800; color:var(--text); white-space:nowrap}
+.rowhead .conc{font-size:11.5px; color:var(--faint); font-weight:600; white-space:nowrap}
+table.data td{
+  text-align:center; font-size:13px; font-weight:700; color:var(--ink);
+  min-width:52px; padding:9px 4px; cursor:pointer; white-space:nowrap;
+}
+td.c-r{background:var(--red)} td.c-o{background:var(--orange)}
+td.c-y{background:var(--yellow)} td.c-g{background:var(--green)}
+table.data td:hover{filter:brightness(.88)}
+table.data td.hl, table.data thead th.hl{outline:3px solid var(--accent); outline-offset:-3px}
+.tablecap{font-size:12.5px; color:var(--faint); margin:10px 2px 0}
+/* ---------- finder ---------- */
+.finder-results{display:grid; gap:10px; margin-top:6px}
+.frow{
+  display:grid; grid-template-columns:150px 1fr auto auto; gap:16px; align-items:center;
+  background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 18px;
+  cursor:pointer; transition:border-color .15s;
+}
+.frow:hover{filter:brightness(1.18)}
+.frow .tier{display:flex; align-items:center; gap:9px; font-size:13.5px; font-weight:700}
+.dot{width:14px; height:14px; border-radius:50%; flex:0 0 14px; border:1px solid #0006}
+.dot.r{background:var(--red)} .dot.o{background:var(--orange)} .dot.y{background:var(--yellow)} .dot.g{background:var(--green)}
+.frow .what{font-size:14.5px} .frow .what small{display:block; color:var(--faint); font-size:12.5px}
+.frow .units{font-size:26px; font-weight:800; letter-spacing:-.5px}
+.frow .units small{font-size:13px; font-weight:600; color:var(--muted)}
+.frow .copy{font-size:12.5px; color:var(--faint); border:1px solid var(--line); border-radius:8px; padding:7px 12px; background:#ffffff08}
+@media (max-width:760px){ .frow{grid-template-columns:1fr auto} .frow .what{grid-column:1/-1} }
+/* ---------- mobile ---------- */
+@media (max-width:760px){
+  .wrap{padding-left:16px; padding-right:16px}
+  /* hero */
+  .kicker{font-size:10.5px; margin-bottom:14px}
+  .hero{padding:34px 0 10px}
+  .hero p{font-size:15.5px}
+  /* tiles */
+  .card{padding:18px}
+  .howto p{font-size:14.5px}
+  /* data table: tighter cells, still sideways-scrollable */
+  table.data thead th{min-width:44px; padding:8px 4px; font-size:11px}
+  table.data thead th.rowhead{padding-left:10px}
+  table.data tbody th.rowhead{min-width:148px; padding:8px 10px}
+  .rowhead .bac{font-size:13px}
+  table.data td{min-width:44px; padding:8px 3px; font-size:12.5px}
+  /* finder rows: tier + units/copy up top, description full-width below */
+  .frow{grid-template-columns:1fr auto auto; gap:8px 10px; padding:12px 14px}
+  .frow .tier{grid-column:1; grid-row:1}
+  .frow .units{grid-column:2; grid-row:1; font-size:22px}
+  .frow .copy{grid-column:3; grid-row:1}
+  .frow .what{grid-column:1/-1; grid-row:2}
+  /* quiz results stack */
+  .qr-row{grid-template-columns:1fr auto; row-gap:6px}
+  .qr-bar{grid-column:1/-1; grid-row:2}
+  /* quiz */
+  .quiz-toggle{font-size:15px; padding:18px}
+  .quiz-options{padding:2px 18px 4px}
+  .quiz-options button{font-size:14px; padding:12px 14px}
+  .quiz-results,.quiz-thanks{padding-left:18px; padding-right:18px}
+  /* math steps stack */
+  .step{grid-template-columns:1fr; gap:10px; padding:16px 18px}
+  .step::before{width:36px; height:36px}
+  /* controls breathe */
+  .controls{gap:10px}
+  select, input[type=number]{min-width:0; flex:1}
+}
+/* ---------- math chapter ---------- */
+.steps{display:grid; gap:14px; counter-reset:step; margin:6px 0 20px}
+.step{
+  display:grid; grid-template-columns:52px 1fr; gap:16px; background:var(--card);
+  border:1px solid var(--line); border-radius:var(--radius); padding:20px 22px; align-items:start;
+}
+.step::before{
+  counter-increment:step; content:counter(step);
+  width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:19px; color:#06121c;
+  background:linear-gradient(135deg,#2dd4bf,#22d3ee);
+}
+.step h3{margin:2px 0 8px; font-size:16.5px}
+.step p{margin:6px 0; color:var(--muted); font-size:14.5px}
+.step .math{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:15px;
+  background:#0a0f16; border:1px solid var(--line); border-radius:10px; padding:12px 16px; margin:10px 0; color:var(--text);
+}
+.step .math b{color:var(--accent)}
+.calc{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; align-items:end}
+.calc-out{
+  grid-column:1/-1; background:#0a0f16; border:1px solid var(--line); border-radius:12px;
+  padding:18px 22px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;
+}
+.calc-out .big{font-size:34px; font-weight:800; color:var(--accent)}
+/* ---------- notes ---------- */
+.note{background:var(--card); border-radius:var(--radius); padding:20px 24px; margin-bottom:14px}
+.note h3{margin:0 0 8px; font-size:15.5px}
+.note p{margin:6px 0; color:var(--muted); font-size:14.5px}
+.note p b, .note p strong{color:var(--text)}
+code.k{font-family:ui-monospace,Menlo,Consolas,monospace; background:#ffffff12; padding:2px 7px; border-radius:6px; font-size:13px; color:var(--text)}
+/* ---------- gradient tile borders: blue-led, unique per tile via --gb ---------- */
+.card,.step,.note,.frow{
+  border:2px solid transparent;
+  background:
+    linear-gradient(180deg,var(--card),var(--bg2)) padding-box,
+    var(--gb,linear-gradient(135deg,#2563eb,#7dd3fc,#a78bfa,#1e40af)) border-box;
+}
+.leg{
+  border:2px solid transparent;
+  background:
+    #0a0f16 padding-box,
+    var(--gb,linear-gradient(135deg,#2563eb,#7dd3fc,#a78bfa,#1e40af)) border-box;
+}
+/* pulsating status dot, top-left of a tile */
+.card,.leg,.step,.note,.frow{position:relative}
+.tile-dot{
+  position:absolute; top:13px; left:13px; width:7px; height:7px; border-radius:50%;
+  background:var(--dot,#22d3ee);
+  box-shadow:0 0 8px 1px var(--dot,#22d3ee);
+  animation:dotPulse 2.4s ease-in-out infinite;
+  pointer-events:none; z-index:2;
+}
+@keyframes dotPulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.5);opacity:.4}}
+@media (prefers-reduced-motion: reduce){.tile-dot{animation:none}}
+/* ---------- footer / toast ---------- */
+footer{border-top:1px solid var(--line); margin-top:56px; padding:30px 0 46px; color:var(--faint); font-size:13px}
+footer p{max-width:90ch}
+.toast{
+  position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(20px); opacity:0;
+  background:#0a0f16; border:1px solid var(--accent); color:var(--text);
+  padding:12px 22px; border-radius:999px; font-size:14px; font-weight:600; z-index:100;
+  transition:all .25s; pointer-events:none; white-space:nowrap;
+}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+.empty{padding:26px; color:var(--faint); text-align:center; font-size:14.5px}
+</style>
+</head>
+<body>
+<div id="progress" aria-hidden="true"><div id="progressFill"></div></div>
+<canvas id="bg-dots" aria-hidden="true"></canvas>
+
+<aside class="sidebar" id="sidebar" aria-label="Site navigation">
+  <div class="side-brand"><span class="drop">💧</span> Reconstitution Sheet</div>
+  <nav class="sidenav" id="chapternav">
+    <a href="#ch1"><span class="n">01</span>Quick reference</a>
+    <a href="#ch2"><span class="n">02</span>Vial reference</a>
+    <a href="#ch3"><span class="n">03</span>Draw finder</a>
+    <a href="#ch4"><span class="n">04</span>The math</a>
+    <a href="#ch5"><span class="n">05</span>Notes</a>
+    <a href="#ch6"><span class="n">06</span>Quick quiz</a>
+  </nav>
+  <div class="side-progress" aria-hidden="true">
+    <div class="sp-head"><span>Reading</span><span id="sidePct">0%</span></div>
+    <div class="sp-bar"><span id="sideFill"></span></div>
+  </div>
+  <div class="side-foot">
+    <button class="theme-btn" id="themeBtn" aria-label="Switch to light mode" title="Toggle light / dark">🌙</button>
+    <span>Light / dark</span>
+  </div>
+</aside>
+<button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
+<div class="side-backdrop" id="sideBackdrop"></div>
+
+<div class="wrap">
+  <div class="hero">
+    <span class="kicker">Interactive reference · dose → drawing units</span>
+    <h1>Reconstitution <span class="grad">sheet</span></h1>
+    <p class="lede">Every vial size, every BAC-water volume, every dose — converted to syringe drawing units, color-coded exactly as in the source chart. Pick a vial, find your dose, read your draw. Click any value to copy it.</p>
+  </div>
+
+  <div class="card howto">
+    <h3>📖 How to use this sheet</h3>
+    <p>Pick your vial size in the <strong>Vial reference</strong> to see every BAC-water option as rows and every dose as columns — where a row and column meet is your syringe draw in units, colored by the chart's own rating (green = ideal, yellow = common range, orange = possible but not ideal, red = avoid). The left column also shows each option's concentration in mg per mL. Click any value to copy it, use the dose menu to spotlight a single column, or open the <strong>Draw finder</strong> if you already know your vial and dose and just want every BAC volume ranked from ideal to avoid.</p>
+  </div>
+
+  <!-- ============ CHAPTER 1 ============ -->
+  <section class="chapter" id="ch1">
+    <div class="ch-head"><span class="ch-num">01</span><h2>Quick reference</h2></div>
+    <p class="ch-sub">The handful of rules that make the whole chart click. Everything below comes straight from the source chart's own notes.</p>
+    <div class="grid c2">
+      <div class="card">
+        <h3>📐 The one formula behind every number</h3>
+        <div class="formula">drawing units <span class="op">=</span> (dose <span class="op">÷</span> vial size) <span class="op">×</span> BAC-water units</div>
+        <p>Example: <strong>0.5 mg</strong> dose from a <strong>5 mg</strong> vial reconstituted with <strong>2 mL</strong> (200 units) of BAC water → (0.5 ÷ 5) × 200 = <strong>20 units</strong>.</p>
+        <div class="exchips">
+          <span class="exchip">1 mL BAC water = <b>100 units</b></span>
+          <span class="exchip">Values rounded to nearest <b>0.5</b></span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>🎯 Aim for 5–30 units per dose</h3>
+        <p>The chart is built around landing your draw in the <strong>5–30 unit</strong> window. Too far below and the draw is hard to measure accurately; too far above and you're injecting an unnecessarily large volume of fluid.</p>
+        <p><strong>Remember:</strong> adding more BAC water only changes the <em>concentration</em> — more fluid injected, not more medication.</p>
+      </div>
+      <div class="card">
+        <h3>💉 Syringe guidance</h3>
+        <p>Use a <strong>0.3 mL insulin syringe</strong> when your draw is 30 units or less — it's the most accurate for small draws.</p>
+        <p>0.5 mL and 1 mL syringes <strong>don't have 0.5-unit markings</strong>, so for any draw ending in 0.5, the 0.3 mL syringe is recommended.</p>
+      </div>
+      <div class="card">
+        <h3>⚖️ Too much vs too little BAC</h3>
+        <p><strong>Too much BAC:</strong> over-dilutes — you must inject far more fluid to reach your dose, which can cause irritation and pain.</p>
+        <p><strong>Too little BAC:</strong> over-concentrates — can cause burning/irritation on injection. Higher doses (e.g. 10–15 mg) may need reconstituting to ~50 units/dose to avoid over-concentration.</p>
+      </div>
+    </div>
+    <h3 style="margin:26px 0 12px; font-size:17px">What the colors mean <span style="color:var(--faint); font-weight:500; font-size:13.5px">— the chart's own rating system</span></h3>
+    <div class="legend">
+      <div class="leg"><span class="swatch g"></span><div><b>Green — ideal</b><span>Reconstitute to this when possible, based on individual dose.</span></div></div>
+      <div class="leg"><span class="swatch y"></span><div><b>Yellow — common range</b><span>Concentrations in the common range, but not necessarily ideal — depends on individual circumstances.</span></div></div>
+      <div class="leg"><span class="swatch o"></span><div><b>Orange — possible, not ideal</b><span>Resulting units may be too low or too high to be fully accurate.</span></div></div>
+      <div class="leg"><span class="swatch r"></span><div><b>Red — avoid</b><span>Too much or too little BAC for that dose. Do not reconstitute to these levels.</span></div></div>
+    </div>
+  </section>
+
+  <!-- ============ CHAPTER 2 ============ -->
+  <section class="chapter" id="ch2">
+    <div class="ch-head"><span class="ch-num">02</span><h2>Vial reference</h2></div>
+    <p class="ch-sub">Pick a vial size to see every BAC-water option and every dose as drawing units — the full chart page for that vial, color-coded exactly as the source.</p>
+    <div class="pills" id="vialPills"></div>
+    <div class="controls">
+      <div class="control"><label for="doseJump">Highlight a dose (mg)</label><select id="doseJump"><option value="">— none —</option></select></div>
+      <div class="control"><label>&nbsp;</label><button class="btn ghost" id="clearHl">Clear highlight</button></div>
+    </div>
+    <p class="hintline">Tip: click any unit value to copy it. The left column shows each BAC volume with its resulting concentration (mg per mL).</p>
+    <div class="tablewrap" id="vialTableWrap"><table class="data" id="vialTable"></table></div>
+    <p class="tablecap" id="vialCap"></p>
+  </section>
+
+  <!-- ============ CHAPTER 3 ============ -->
+  <section class="chapter" id="ch3">
+    <div class="ch-head"><span class="ch-num">03</span><h2>Draw finder</h2></div>
+    <p class="ch-sub">You know your vial size and your dose — which BAC-water volume gives the best draw? Ranked from ideal to avoid.</p>
+    <div class="pills" id="finderPills"></div>
+    <div class="controls">
+      <div class="control"><label for="finderDose">Your dose (mg)</label><select id="finderDose"></select></div>
+    </div>
+    <div class="finder-results" id="finderResults"></div>
+  </section>
+
+  <!-- ============ CHAPTER 4 ============ -->
+  <section class="chapter" id="ch4">
+    <div class="ch-head"><span class="ch-num">04</span><h2>How the numbers are calculated</h2></div>
+    <p class="ch-sub">Every value in the chart comes from three simple steps. Worked here with the source chart's own example: a 5 mg vial, 2 mL of BAC water, 0.5 mg dose.</p>
+    <div class="steps">
+      <div class="step">
+        <div><h3>Find the concentration</h3>
+        <p>Divide what's in the vial by how much BAC water you add. This tells you how much medication is in each mL.</p>
+        <div class="math">5 mg ÷ 2 mL = <b>2.5 mg per mL</b></div></div>
+      </div>
+      <div class="step">
+        <div><h3>Find the fluid volume for your dose</h3>
+        <p>Divide your dose by the concentration. This tells you how many mL of fluid carry your dose.</p>
+        <div class="math">0.5 mg ÷ 2.5 mg/mL = <b>0.2 mL</b></div></div>
+      </div>
+      <div class="step">
+        <div><h3>Convert mL to syringe units</h3>
+        <p>On an insulin syringe, 1 mL = 100 units. Multiply — then round to the nearest 0.5, the smallest marking you can measure.</p>
+        <div class="math">0.2 mL × 100 = <b>20 units</b> → draw to the <b>20</b> mark</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>🧮 Try the formula yourself</h3>
+      <p>Enter any combination — the math is identical to what built the chart.</p>
+      <div class="calc">
+        <div class="control"><label for="cVial">Vial size (mg)</label><input type="number" id="cVial" value="5" step="any" min="0"></div>
+        <div class="control"><label for="cBac">BAC water (mL)</label><input type="number" id="cBac" value="2" step="any" min="0"></div>
+        <div class="control"><label for="cDose">Dose (mg)</label><input type="number" id="cDose" value="0.5" step="any" min="0"></div>
+        <div class="calc-out"><span class="big" id="cOut">20</span><span style="color:var(--muted)">drawing units <span style="font-size:13px">(rounded to nearest 0.5)</span></span></div>
+      </div>
+    </div>
+    <div class="note" style="margin-top:16px">
+      <h3>🔍 A note on the source chart's rounding</h3>
+      <p>The chart states all draws are rounded to the <strong>nearest 0.5</strong> — and the vast majority are. While verifying, <strong>115 cells</strong> (mostly in the 20–50 mg vial tables) were found where an exact <code class="k">X.5</code> result is printed as the next whole unit instead (e.g. a calculated 6.5 appears as 7.0). These values are reproduced here <strong>exactly as printed</strong> in the source. The mini-calculator above uses strict round-to-nearest-0.5, so it may differ from the chart on exactly those cells.</p>
+    </div>
+  </section>
+
+  <!-- ============ CHAPTER 5 ============ -->
+  <section class="chapter" id="ch5">
+    <div class="ch-head"><span class="ch-num">05</span><h2>Important notes</h2></div>
+    <p class="ch-sub">The source chart's own notes and fine print, plus what this reference does and doesn't cover.</p>
+    <div class="note">
+      <h3>📏 Rounding &amp; syringes</h3>
+      <p>All unit draws are <strong>rounded to the nearest 0.5</strong>, because 0.5 is the smallest unit measurement available on an insulin syringe. For any draw ending in 0.5, use a <strong>0.3 mL insulin syringe</strong> (assuming the draw is 30 units or less) for the most accurate draw — 0.5 mL and 1 mL syringes don't have 0.5-unit markings.</p>
+    </div>
+    <div class="note">
+      <h3>🎯 The 5–30 unit target</h3>
+      <p>Aim to reconstitute so each dose lands at <strong>5–30 units</strong>. The chart's example: a 5 mg vial with a 0.5 mg dose — adding anywhere from 0.5–3 mL of BAC gives a draw in that usable range. <strong>Adding more BAC only changes the concentration</strong> — it means more fluid injected, not more medication. For higher doses (10–15 mg), reconstituting to ~50 units/dose may be needed to keep the dose from being over-concentrated.</p>
+    </div>
+    <div class="note warn">
+      <h3>⚠️ Balance the BAC volume</h3>
+      <p><strong>Too much BAC</strong> over-dilutes: you must inject far more fluid to reach your dose, which can cause irritation and pain, and is unnecessary. <strong>Too little BAC</strong> over-concentrates: it can cause burning/irritation on injection. Higher doses may require reconstitution to higher units.</p>
+    </div>
+    <div class="note">
+      <h3>🚦 The color system</h3>
+      <p><strong style="color:#ea9999">Red</strong> = too much or too little BAC for that dose — do not use. <strong style="color:#f5c99b">Orange</strong> = possible but not ideal (draw may be too small or too large to measure accurately). <strong style="color:#fff2cc">Yellow</strong> = common range, not necessarily ideal. <strong style="color:#bfe3c9">Green</strong> = ideal — use when possible for your dose.</p>
+    </div>
+    <div class="note">
+      <h3>📦 Coverage &amp; limits</h3>
+      <p>This reference covers <strong>vial sizes 2–60 mg</strong> and <strong>doses 0.05–15 mg</strong> — the full range of the source chart. Where a dose is larger than the vial, no value is shown. BAC water is assumed at <strong>100 units per mL</strong>. This is a faithful interactive reproduction of a third-party chart: it doesn't replace the product's own labeling, a pharmacist, or a clinician.</p>
+    </div>
+    <div class="note warn">
+      <h3>⚕️ Educational reference only</h3>
+      <p>This page is an <strong>educational reference tool</strong> reproducing the provided reconstitution chart. It is not medical advice, and it doesn't recommend using any medication. Always verify calculations independently and consult a qualified professional for anything you put into your body.</p>
+    </div>
+  </section>
+
+  <!-- ============ CHAPTER 6 : QUIZ ============ -->
+  <section class="chapter" id="ch6">
+    <div class="ch-head"><span class="ch-num">06</span><h2>Quick quiz</h2></div>
+    <p class="ch-sub">One question — tell me how this sheet landed for you.</p>
+    <div class="card quiz" id="quizCard">
+      <button class="quiz-toggle" id="quizToggle" aria-expanded="false">
+        <span class="q">How would you rate this sheet?</span>
+        <span class="quiz-chevron" aria-hidden="true">+</span>
+      </button>
+      <div class="quiz-body" id="quizBody">
+        <div class="quiz-inner">
+          <div class="quiz-options" id="quizOptions">
+            <button data-v="4">⭐ Excellent <small>exactly what I needed</small></button>
+            <button data-v="3">👍 Great <small>very useful</small></button>
+            <button data-v="2">🙂 Good <small>does the job</small></button>
+            <button data-v="1">😐 It's okay <small>could be better</small></button>
+          </div>
+          <p class="quiz-thanks" id="quizThanks" hidden></p>
+          <div class="quiz-results" id="quizResults" hidden>
+            <p class="qr-head"><span id="qrTotal"></span> · <span class="qr-note">votes stay in this browser</span></p>
+            <div id="qrRows"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p><strong style="color:var(--muted)">Reconstitution Sheet</strong> — interactive reproduction of the “RECONSTITUTION CHART — BASED ON DOSE” PDF: 17 vial sizes, 132 vial/BAC combinations, 3,597 drawing-unit values, color-coded cell-for-cell. Educational reference only; not medical advice.</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DATA = /*DATA_JSON*/{"doses": [0.05, 0.1, 0.125, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.75, 0.9, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 4, 5, 6, 7.5, 8, 9, 10, 11, 12, 12.5, 13, 14, 15], "rows": [{"v": 2, "b": 40, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 2.0, "c": "o"}, {"d": 0.125, "u": 2.5, "c": "o"}, {"d": 0.15, "u": 3.0, "c": "y"}, {"d": 0.2, "u": 4.0, "c": "y"}, {"d": 0.25, "u": 5.0, "c": "g"}, {"d": 0.3, "u": 6.0, "c": "g"}, {"d": 0.4, "u": 8.0, "c": "g"}, {"d": 0.5, "u": 10.0, "c": "g"}, {"d": 0.6, "u": 12.0, "c": "g"}, {"d": 0.75, "u": 15.0, "c": "g"}, {"d": 0.9, "u": 18.0, "c": "g"}, {"d": 1, "u": 20.0, "c": "g"}, {"d": 1.25, "u": 25.0, "c": "g"}, {"d": 1.5, "u": 30.0, "c": "g"}, {"d": 1.75, "u": 35.0, "c": "y"}, {"d": 2, "u": 40.0, "c": "y"}]}, {"v": 2, "b": 50, "cells": [{"d": 0.05, "u": 1.5, "c": "o"}, {"d": 0.1, "u": 2.5, "c": "o"}, {"d": 0.125, "u": 3.0, "c": "y"}, {"d": 0.15, "u": 4.0, "c": "y"}, {"d": 0.2, "u": 5.0, "c": "g"}, {"d": 0.25, "u": 6.5, "c": "g"}, {"d": 0.3, "u": 7.5, "c": "g"}, {"d": 0.4, "u": 10.0, "c": "g"}, {"d": 0.5, "u": 12.5, "c": "g"}, {"d": 0.6, "u": 15.0, "c": "g"}, {"d": 0.75, "u": 19.0, "c": "g"}, {"d": 0.9, "u": 22.5, "c": "g"}, {"d": 1, "u": 25.0, "c": "g"}, {"d": 1.25, "u": 31.5, "c": "y"}, {"d": 1.5, "u": 37.5, "c": "y"}, {"d": 1.75, "u": 44.0, "c": "y"}, {"d": 2, "u": 50.0, "c": "y"}]}, {"v": 2, "b": 100, "cells": [{"d": 0.05, "u": 2.5, "c": "o"}, {"d": 0.1, "u": 5.0, "c": "g"}, {"d": 0.125, "u": 6.5, "c": "g"}, {"d": 0.15, "u": 7.5, "c": "g"}, {"d": 0.2, "u": 10.0, "c": "g"}, {"d": 0.25, "u": 12.5, "c": "g"}, {"d": 0.3, "u": 15.0, "c": "g"}, {"d": 0.4, "u": 20.0, "c": "g"}, {"d": 0.5, "u": 25.0, "c": "g"}, {"d": 0.6, "u": 30.0, "c": "g"}, {"d": 0.75, "u": 37.5, "c": "y"}, {"d": 0.9, "u": 45.0, "c": "y"}, {"d": 1, "u": 50.0, "c": "y"}, {"d": 1.25, "u": 62.5, "c": "o"}, {"d": 1.5, "u": 75.0, "c": "o"}, {"d": 1.75, "u": 87.5, "c": "o"}, {"d": 2, "u": 100.0, "c": "o"}]}, {"v": 2, "b": 125, "cells": [{"d": 0.05, "u": 3.0, "c": "y"}, {"d": 0.1, "u": 6.5, "c": "g"}, {"d": 0.125, "u": 8.0, "c": "g"}, {"d": 0.15, "u": 9.5, "c": "g"}, {"d": 0.2, "u": 12.5, "c": "g"}, {"d": 0.25, "u": 15.5, "c": "g"}, {"d": 0.3, "u": 19.0, "c": "g"}, {"d": 0.4, "u": 25.0, "c": "g"}, {"d": 0.5, "u": 31.5, "c": "y"}, {"d": 0.6, "u": 37.5, "c": "y"}, {"d": 0.75, "u": 47.0, "c": "y"}, {"d": 0.9, "u": 56.5, "c": "o"}, {"d": 1, "u": 62.5, "c": "o"}, {"d": 1.25, "u": 78.0, "c": "o"}, {"d": 1.5, "u": 94.0, "c": "o"}, {"d": 1.75, "u": 109.5, "c": "r"}, {"d": 2, "u": 125.0, "c": "r"}]}, {"v": 2, "b": 150, "cells": [{"d": 0.05, "u": 4.0, "c": "y"}, {"d": 0.1, "u": 7.5, "c": "g"}, {"d": 0.125, "u": 9.5, "c": "g"}, {"d": 0.15, "u": 11.5, "c": "g"}, {"d": 0.2, "u": 15.0, "c": "g"}, {"d": 0.25, "u": 19.0, "c": "g"}, {"d": 0.3, "u": 22.5, "c": "g"}, {"d": 0.4, "u": 30.0, "c": "g"}, {"d": 0.5, "u": 37.5, "c": "y"}, {"d": 0.6, "u": 45.0, "c": "y"}, {"d": 0.75, "u": 56.5, "c": "o"}, {"d": 0.9, "u": 67.5, "c": "o"}, {"d": 1, "u": 75.0, "c": "o"}, {"d": 1.25, "u": 94.0, "c": "o"}, {"d": 1.5, "u": 112.5, "c": "r"}, {"d": 1.75, "u": 131.5, "c": "r"}, {"d": 2, "u": 150.0, "c": "r"}]}, {"v": 2, "b": 200, "cells": [{"d": 0.05, "u": 5.0, "c": "g"}, {"d": 0.1, "u": 10.0, "c": "g"}, {"d": 0.125, "u": 12.5, "c": "g"}, {"d": 0.15, "u": 15.0, "c": "g"}, {"d": 0.2, "u": 20.0, "c": "g"}, {"d": 0.25, "u": 25.0, "c": "g"}, {"d": 0.3, "u": 30.0, "c": "g"}, {"d": 0.4, "u": 40.0, "c": "y"}, {"d": 0.5, "u": 50.0, "c": "y"}, {"d": 0.6, "u": 60.0, "c": "o"}, {"d": 0.75, "u": 75.0, "c": "o"}, {"d": 0.9, "u": 90.0, "c": "o"}, {"d": 1, "u": 100.0, "c": "o"}, {"d": 1.25, "u": 125.0, "c": "r"}, {"d": 1.5, "u": 150.0, "c": "r"}, {"d": 1.75, "u": 175.0, "c": "r"}, {"d": 2, "u": 200.0, "c": "r"}]}, {"v": 4, "b": 50, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.5, "c": "o"}, {"d": 0.125, "u": 1.5, "c": "o"}, {"d": 0.15, "u": 2.0, "c": "o"}, {"d": 0.2, "u": 2.5, "c": "o"}, {"d": 0.25, "u": 3.0, "c": "y"}, {"d": 0.3, "u": 4.0, "c": "y"}, {"d": 0.4, "u": 5.0, "c": "g"}, {"d": 0.5, "u": 6.5, "c": "g"}, {"d": 0.6, "u": 7.5, "c": "g"}, {"d": 0.75, "u": 9.5, "c": "g"}, {"d": 0.9, "u": 11.5, "c": "g"}, {"d": 1, "u": 12.5, "c": "g"}, {"d": 1.25, "u": 15.5, "c": "g"}, {"d": 1.5, "u": 19.0, "c": "g"}, {"d": 1.75, "u": 22.0, "c": "g"}, {"d": 2, "u": 25.0, "c": "g"}, {"d": 2.5, "u": 31.5, "c": "y"}, {"d": 3, "u": 37.5, "c": "y"}, {"d": 4, "u": 50.0, "c": "y"}]}, {"v": 4, "b": 100, "cells": [{"d": 0.05, "u": 1.5, "c": "o"}, {"d": 0.1, "u": 2.5, "c": "o"}, {"d": 0.125, "u": 3.0, "c": "y"}, {"d": 0.15, "u": 4.0, "c": "y"}, {"d": 0.2, "u": 5.0, "c": "g"}, {"d": 0.25, "u": 6.5, "c": "g"}, {"d": 0.3, "u": 7.5, "c": "g"}, {"d": 0.4, "u": 10.0, "c": "g"}, {"d": 0.5, "u": 12.5, "c": "g"}, {"d": 0.6, "u": 15.0, "c": "g"}, {"d": 0.75, "u": 19.0, "c": "g"}, {"d": 0.9, "u": 22.5, "c": "g"}, {"d": 1, "u": 25.0, "c": "g"}, {"d": 1.25, "u": 31.5, "c": "y"}, {"d": 1.5, "u": 37.5, "c": "y"}, {"d": 1.75, "u": 44.0, "c": "y"}, {"d": 2, "u": 50.0, "c": "y"}, {"d": 2.5, "u": 62.5, "c": "o"}, {"d": 3, "u": 75.0, "c": "o"}, {"d": 4, "u": 100.0, "c": "o"}]}, {"v": 4, "b": 125, "cells": [{"d": 0.05, "u": 1.5, "c": "o"}, {"d": 0.1, "u": 3.0, "c": "y"}, {"d": 0.125, "u": 4.0, "c": "y"}, {"d": 0.15, "u": 4.5, "c": "y"}, {"d": 0.2, "u": 6.5, "c": "g"}, {"d": 0.25, "u": 8.0, "c": "g"}, {"d": 0.3, "u": 9.5, "c": "g"}, {"d": 0.4, "u": 12.5, "c": "g"}, {"d": 0.5, "u": 15.5, "c": "g"}, {"d": 0.6, "u": 19.0, "c": "g"}, {"d": 0.75, "u": 23.5, "c": "g"}, {"d": 0.9, "u": 28.0, "c": "g"}, {"d": 1, "u": 31.5, "c": "y"}, {"d": 1.25, "u": 39.0, "c": "y"}, {"d": 1.5, "u": 47.0, "c": "y"}, {"d": 1.75, "u": 54.5, "c": "o"}, {"d": 2, "u": 62.5, "c": "o"}, {"d": 2.5, "u": 78.0, "c": "o"}, {"d": 3, "u": 94.0, "c": "o"}, {"d": 4, "u": 125.0, "c": "r"}]}, {"v": 4, "b": 150, "cells": [{"d": 0.05, "u": 2.0, "c": "o"}, {"d": 0.1, "u": 4.0, "c": "y"}, {"d": 0.125, "u": 4.5, "c": "y"}, {"d": 0.15, "u": 5.5, "c": "g"}, {"d": 0.2, "u": 7.5, "c": "g"}, {"d": 0.25, "u": 9.5, "c": "g"}, {"d": 0.3, "u": 11.5, "c": "g"}, {"d": 0.4, "u": 15.0, "c": "g"}, {"d": 0.5, "u": 19.0, "c": "g"}, {"d": 0.6, "u": 22.5, "c": "g"}, {"d": 0.75, "u": 28.0, "c": "g"}, {"d": 0.9, "u": 34.0, "c": "y"}, {"d": 1, "u": 37.5, "c": "y"}, {"d": 1.25, "u": 47.0, "c": "y"}, {"d": 1.5, "u": 56.5, "c": "o"}, {"d": 1.75, "u": 65.5, "c": "o"}, {"d": 2, "u": 75.0, "c": "o"}, {"d": 2.5, "u": 94.0, "c": "o"}, {"d": 3, "u": 112.5, "c": "r"}, {"d": 4, "u": 150.0, "c": "r"}]}, {"v": 4, "b": 200, "cells": [{"d": 0.05, "u": 2.5, "c": "o"}, {"d": 0.1, "u": 5.0, "c": "g"}, {"d": 0.125, "u": 6.5, "c": "g"}, {"d": 0.15, "u": 7.5, "c": "g"}, {"d": 0.2, "u": 10.0, "c": "g"}, {"d": 0.25, "u": 12.5, "c": "g"}, {"d": 0.3, "u": 15.0, "c": "g"}, {"d": 0.4, "u": 20.0, "c": "g"}, {"d": 0.5, "u": 25.0, "c": "g"}, {"d": 0.6, "u": 30.0, "c": "g"}, {"d": 0.75, "u": 37.5, "c": "y"}, {"d": 0.9, "u": 45.0, "c": "y"}, {"d": 1, "u": 50.0, "c": "y"}, {"d": 1.25, "u": 62.5, "c": "o"}, {"d": 1.5, "u": 75.0, "c": "o"}, {"d": 1.75, "u": 87.5, "c": "o"}, {"d": 2, "u": 100.0, "c": "o"}, {"d": 2.5, "u": 125.0, "c": "r"}, {"d": 3, "u": 150.0, "c": "r"}, {"d": 4, "u": 200.0, "c": "r"}]}, {"v": 4, "b": 250, "cells": [{"d": 0.05, "u": 3.0, "c": "y"}, {"d": 0.1, "u": 6.5, "c": "g"}, {"d": 0.125, "u": 8.0, "c": "g"}, {"d": 0.15, "u": 9.5, "c": "g"}, {"d": 0.2, "u": 12.5, "c": "g"}, {"d": 0.25, "u": 15.5, "c": "g"}, {"d": 0.3, "u": 19.0, "c": "g"}, {"d": 0.4, "u": 25.0, "c": "g"}, {"d": 0.5, "u": 31.5, "c": "y"}, {"d": 0.6, "u": 37.5, "c": "y"}, {"d": 0.75, "u": 47.0, "c": "y"}, {"d": 0.9, "u": 56.5, "c": "o"}, {"d": 1, "u": 62.5, "c": "o"}, {"d": 1.25, "u": 78.0, "c": "o"}, {"d": 1.5, "u": 94.0, "c": "o"}, {"d": 1.75, "u": 109.5, "c": "r"}, {"d": 2, "u": 125.0, "c": "r"}, {"d": 2.5, "u": 156.5, "c": "r"}, {"d": 3, "u": 187.5, "c": "r"}, {"d": 4, "u": 250.0, "c": "r"}]}, {"v": 4, "b": 300, "cells": [{"d": 0.05, "u": 4.0, "c": "y"}, {"d": 0.1, "u": 7.5, "c": "g"}, {"d": 0.125, "u": 9.5, "c": "g"}, {"d": 0.15, "u": 11.5, "c": "g"}, {"d": 0.2, "u": 15.0, "c": "g"}, {"d": 0.25, "u": 19.0, "c": "g"}, {"d": 0.3, "u": 22.5, "c": "g"}, {"d": 0.4, "u": 30.0, "c": "g"}, {"d": 0.5, "u": 37.5, "c": "y"}, {"d": 0.6, "u": 45.0, "c": "y"}, {"d": 0.75, "u": 56.5, "c": "o"}, {"d": 0.9, "u": 67.5, "c": "o"}, {"d": 1, "u": 75.0, "c": "o"}, {"d": 1.25, "u": 94.0, "c": "o"}, {"d": 1.5, "u": 112.5, "c": "r"}, {"d": 1.75, "u": 131.5, "c": "r"}, {"d": 2, "u": 150.0, "c": "r"}, {"d": 2.5, "u": 187.5, "c": "r"}, {"d": 3, "u": 225.0, "c": "r"}, {"d": 4, "u": 300.0, "c": "r"}]}, {"v": 4, "b": 400, "cells": [{"d": 0.05, "u": 5.0, "c": "g"}, {"d": 0.1, "u": 10.0, "c": "g"}, {"d": 0.125, "u": 12.5, "c": "g"}, {"d": 0.15, "u": 15.0, "c": "g"}, {"d": 0.2, "u": 20.0, "c": "g"}, {"d": 0.25, "u": 25.0, "c": "g"}, {"d": 0.3, "u": 30.0, "c": "g"}, {"d": 0.4, "u": 40.0, "c": "y"}, {"d": 0.5, "u": 50.0, "c": "y"}, {"d": 0.6, "u": 60.0, "c": "o"}, {"d": 0.75, "u": 75.0, "c": "o"}, {"d": 0.9, "u": 90.0, "c": "o"}, {"d": 1, "u": 100.0, "c": "o"}, {"d": 1.25, "u": 125.0, "c": "r"}, {"d": 1.5, "u": 150.0, "c": "r"}, {"d": 1.75, "u": 175.0, "c": "r"}, {"d": 2, "u": 200.0, "c": "r"}, {"d": 2.5, "u": 250.0, "c": "r"}, {"d": 3, "u": 300.0, "c": "r"}, {"d": 4, "u": 400.0, "c": "r"}]}, {"v": 5, "b": 50, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "o"}, {"d": 0.125, "u": 1.5, "c": "o"}, {"d": 0.15, "u": 1.5, "c": "o"}, {"d": 0.2, "u": 2.0, "c": "o"}, {"d": 0.25, "u": 2.5, "c": "o"}, {"d": 0.3, "u": 3.0, "c": "y"}, {"d": 0.4, "u": 4.0, "c": "y"}, {"d": 0.5, "u": 5.0, "c": "g"}, {"d": 0.6, "u": 6.0, "c": "g"}, {"d": 0.75, "u": 7.5, "c": "g"}, {"d": 0.9, "u": 9.0, "c": "g"}, {"d": 1, "u": 10.0, "c": "g"}, {"d": 1.25, "u": 12.5, "c": "g"}, {"d": 1.5, "u": 15.0, "c": "g"}, {"d": 1.75, "u": 17.5, "c": "g"}, {"d": 2, "u": 20.0, "c": "g"}, {"d": 2.5, "u": 25.0, "c": "g"}, {"d": 3, "u": 30.0, "c": "g"}, {"d": 4, "u": 40.0, "c": "y"}, {"d": 5, "u": 50.0, "c": "y"}]}, {"v": 5, "b": 100, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 2.0, "c": "o"}, {"d": 0.125, "u": 2.5, "c": "o"}, {"d": 0.15, "u": 3.0, "c": "y"}, {"d": 0.2, "u": 4.0, "c": "y"}, {"d": 0.25, "u": 5.0, "c": "g"}, {"d": 0.3, "u": 6.0, "c": "g"}, {"d": 0.4, "u": 8.0, "c": "g"}, {"d": 0.5, "u": 10.0, "c": "g"}, {"d": 0.6, "u": 12.0, "c": "g"}, {"d": 0.75, "u": 15.0, "c": "g"}, {"d": 0.9, "u": 18.0, "c": "g"}, {"d": 1, "u": 20.0, "c": "g"}, {"d": 1.25, "u": 25.0, "c": "g"}, {"d": 1.5, "u": 30.0, "c": "g"}, {"d": 1.75, "u": 35.0, "c": "y"}, {"d": 2, "u": 40.0, "c": "y"}, {"d": 2.5, "u": 50.0, "c": "y"}, {"d": 3, "u": 60.0, "c": "o"}, {"d": 4, "u": 80.0, "c": "o"}, {"d": 5, "u": 100.0, "c": "o"}]}, {"v": 5, "b": 125, "cells": [{"d": 0.05, "u": 1.5, "c": "o"}, {"d": 0.1, "u": 2.5, "c": "o"}, {"d": 0.125, "u": 3.0, "c": "y"}, {"d": 0.15, "u": 4.0, "c": "y"}, {"d": 0.2, "u": 5.0, "c": "g"}, {"d": 0.25, "u": 6.5, "c": "g"}, {"d": 0.3, "u": 7.5, "c": "g"}, {"d": 0.4, "u": 10.0, "c": "g"}, {"d": 0.5, "u": 12.5, "c": "g"}, {"d": 0.6, "u": 15.0, "c": "g"}, {"d": 0.75, "u": 19.0, "c": "g"}, {"d": 0.9, "u": 22.5, "c": "g"}, {"d": 1, "u": 25.0, "c": "g"}, {"d": 1.25, "u": 31.5, "c": "y"}, {"d": 1.5, "u": 37.5, "c": "y"}, {"d": 1.75, "u": 44.0, "c": "y"}, {"d": 2, "u": 50.0, "c": "y"}, {"d": 2.5, "u": 62.5, "c": "o"}, {"d": 3, "u": 75.0, "c": "o"}, {"d": 4, "u": 100.0, "c": "o"}, {"d": 5, "u": 125.0, "c": "r"}]}, {"v": 5, "b": 150, "cells": [{"d": 0.05, "u": 1.5, "c": "o"}, {"d": 0.1, "u": 3.0, "c": "y"}, {"d": 0.125, "u": 4.0, "c": "y"}, {"d": 0.15, "u": 4.5, "c": "y"}, {"d": 0.2, "u": 6.0, "c": "g"}, {"d": 0.25, "u": 7.5, "c": "g"}, {"d": 0.3, "u": 9.0, "c": "g"}, {"d": 0.4, "u": 12.0, "c": "g"}, {"d": 0.5, "u": 15.0, "c": "g"}, {"d": 0.6, "u": 18.0, "c": "g"}, {"d": 0.75, "u": 22.5, "c": "g"}, {"d": 0.9, "u": 27.0, "c": "g"}, {"d": 1, "u": 30.0, "c": "g"}, {"d": 1.25, "u": 37.5, "c": "y"}, {"d": 1.5, "u": 45.0, "c": "y"}, {"d": 1.75, "u": 52.5, "c": "o"}, {"d": 2, "u": 60.0, "c": "o"}, {"d": 2.5, "u": 75.0, "c": "o"}, {"d": 3, "u": 90.0, "c": "o"}, {"d": 4, "u": 120.0, "c": "r"}, {"d": 5, "u": 150.0, "c": "r"}]}, {"v": 5, "b": 200, "cells": [{"d": 0.05, "u": 2.0, "c": "o"}, {"d": 0.1, "u": 4.0, "c": "y"}, {"d": 0.125, "u": 5.0, "c": "g"}, {"d": 0.15, "u": 6.0, "c": "g"}, {"d": 0.2, "u": 8.0, "c": "g"}, {"d": 0.25, "u": 10.0, "c": "g"}, {"d": 0.3, "u": 12.0, "c": "g"}, {"d": 0.4, "u": 16.0, "c": "g"}, {"d": 0.5, "u": 20.0, "c": "g"}, {"d": 0.6, "u": 24.0, "c": "g"}, {"d": 0.75, "u": 30.0, "c": "g"}, {"d": 0.9, "u": 36.0, "c": "y"}, {"d": 1, "u": 40.0, "c": "y"}, {"d": 1.25, "u": 50.0, "c": "y"}, {"d": 1.5, "u": 60.0, "c": "o"}, {"d": 1.75, "u": 70.0, "c": "o"}, {"d": 2, "u": 80.0, "c": "o"}, {"d": 2.5, "u": 100.0, "c": "o"}, {"d": 3, "u": 120.0, "c": "r"}, {"d": 4, "u": 160.0, "c": "r"}, {"d": 5, "u": 200.0, "c": "r"}]}, {"v": 5, "b": 250, "cells": [{"d": 0.05, "u": 2.5, "c": "o"}, {"d": 0.1, "u": 5.0, "c": "g"}, {"d": 0.125, "u": 6.5, "c": "g"}, {"d": 0.15, "u": 7.5, "c": "g"}, {"d": 0.2, "u": 10.0, "c": "g"}, {"d": 0.25, "u": 12.5, "c": "g"}, {"d": 0.3, "u": 15.0, "c": "g"}, {"d": 0.4, "u": 20.0, "c": "g"}, {"d": 0.5, "u": 25.0, "c": "g"}, {"d": 0.6, "u": 30.0, "c": "g"}, {"d": 0.75, "u": 37.5, "c": "y"}, {"d": 0.9, "u": 45.0, "c": "y"}, {"d": 1, "u": 50.0, "c": "y"}, {"d": 1.25, "u": 62.5, "c": "o"}, {"d": 1.5, "u": 75.0, "c": "o"}, {"d": 1.75, "u": 87.5, "c": "o"}, {"d": 2, "u": 100.0, "c": "o"}, {"d": 2.5, "u": 125.0, "c": "r"}, {"d": 3, "u": 150.0, "c": "r"}, {"d": 4, "u": 200.0, "c": "r"}, {"d": 5, "u": 250.0, "c": "r"}]}, {"v": 5, "b": 300, "cells": [{"d": 0.05, "u": 3.0, "c": "y"}, {"d": 0.1, "u": 6.0, "c": "g"}, {"d": 0.125, "u": 7.5, "c": "g"}, {"d": 0.15, "u": 9.0, "c": "g"}, {"d": 0.2, "u": 12.0, "c": "g"}, {"d": 0.25, "u": 15.0, "c": "g"}, {"d": 0.3, "u": 18.0, "c": "g"}, {"d": 0.4, "u": 24.0, "c": "g"}, {"d": 0.5, "u": 30.0, "c": "g"}, {"d": 0.6, "u": 36.0, "c": "y"}, {"d": 0.75, "u": 45.0, "c": "y"}, {"d": 0.9, "u": 54.0, "c": "o"}, {"d": 1, "u": 60.0, "c": "o"}, {"d": 1.25, "u": 75.0, "c": "o"}, {"d": 1.5, "u": 90.0, "c": "o"}, {"d": 1.75, "u": 105.0, "c": "r"}, {"d": 2, "u": 120.0, "c": "r"}, {"d": 2.5, "u": 150.0, "c": "r"}, {"d": 3, "u": 180.0, "c": "r"}, {"d": 4, "u": 240.0, "c": "r"}, {"d": 5, "u": 300.0, "c": "r"}]}, {"v": 5, "b": 400, "cells": [{"d": 0.05, "u": 4.0, "c": "y"}, {"d": 0.1, "u": 8.0, "c": "g"}, {"d": 0.125, "u": 10.0, "c": "g"}, {"d": 0.15, "u": 12.0, "c": "g"}, {"d": 0.2, "u": 16.0, "c": "g"}, {"d": 0.25, "u": 20.0, "c": "g"}, {"d": 0.3, "u": 24.0, "c": "g"}, {"d": 0.4, "u": 32.0, "c": "y"}, {"d": 0.5, "u": 40.0, "c": "y"}, {"d": 0.6, "u": 48.0, "c": "y"}, {"d": 0.75, "u": 60.0, "c": "o"}, {"d": 0.9, "u": 72.0, "c": "o"}, {"d": 1, "u": 80.0, "c": "o"}, {"d": 1.25, "u": 100.0, "c": "o"}, {"d": 1.5, "u": 120.0, "c": "r"}, {"d": 1.75, "u": 140.0, "c": "r"}, {"d": 2, "u": 160.0, "c": "r"}, {"d": 2.5, "u": 200.0, "c": "r"}, {"d": 3, "u": 240.0, "c": "r"}, {"d": 4, "u": 320.0, "c": "r"}, {"d": 5, "u": 400.0, "c": "r"}]}, {"v": 5, "b": 500, "cells": [{"d": 0.05, "u": 5.0, "c": "g"}, {"d": 0.1, "u": 10.0, "c": "g"}, {"d": 0.125, "u": 12.5, "c": "g"}, {"d": 0.15, "u": 15.0, "c": "g"}, {"d": 0.2, "u": 20.0, "c": "g"}, {"d": 0.25, "u": 25.0, "c": "g"}, {"d": 0.3, "u": 30.0, "c": "g"}, {"d": 0.4, "u": 40.0, "c": "y"}, {"d": 0.5, "u": 50.0, "c": "y"}, {"d": 0.6, "u": 60.0, "c": "o"}, {"d": 0.75, "u": 75.0, "c": "o"}, {"d": 0.9, "u": 90.0, "c": "o"}, {"d": 1, "u": 100.0, "c": "o"}, {"d": 1.25, "u": 125.0, "c": "r"}, {"d": 1.5, "u": 150.0, "c": "r"}, {"d": 1.75, "u": 175.0, "c": "r"}, {"d": 2, "u": 200.0, "c": "r"}, {"d": 2.5, "u": 250.0, "c": "r"}, {"d": 3, "u": 300.0, "c": "r"}, {"d": 4, "u": 400.0, "c": "r"}, {"d": 5, "u": 500.0, "c": "r"}]}, {"v": 6, "b": 60, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "o"}, {"d": 0.125, "u": 2.0, "c": "o"}, {"d": 0.15, "u": 1.5, "c": "o"}, {"d": 0.2, "u": 2.0, "c": "o"}, {"d": 0.25, "u": 2.5, "c": "o"}, {"d": 0.3, "u": 3.0, "c": "y"}, {"d": 0.4, "u": 4.0, "c": "y"}, {"d": 0.5, "u": 5.0, "c": "g"}, {"d": 0.6, "u": 6.0, "c": "g"}, {"d": 0.75, "u": 7.5, "c": "g"}, {"d": 0.9, "u": 9.0, "c": "g"}, {"d": 1, "u": 10.0, "c": "g"}, {"d": 1.25, "u": 12.5, "c": "g"}, {"d": 1.5, "u": 15.0, "c": "g"}, {"d": 1.75, "u": 17.5, "c": "g"}, {"d": 2, "u": 20.0, "c": "g"}, {"d": 2.5, "u": 25.0, "c": "g"}, {"d": 3, "u": 30.0, "c": "g"}, {"d": 4, "u": 40.0, "c": "y"}, {"d": 5, "u": 50.0, "c": "y"}, {"d": 6, "u": 60.0, "c": "o"}]}, {"v": 6, "b": 100, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 1.5, "c": "o"}, {"d": 0.125, "u": 2.0, "c": "o"}, {"d": 0.15, "u": 2.5, "c": "o"}, {"d": 0.2, "u": 3.5, "c": "y"}, {"d": 0.25, "u": 4.0, "c": "y"}, {"d": 0.3, "u": 5.0, "c": "g"}, {"d": 0.4, "u": 6.5, "c": "g"}, {"d": 0.5, "u": 8.5, "c": "g"}, {"d": 0.6, "u": 10.0, "c": "g"}, {"d": 0.75, "u": 12.5, "c": "g"}, {"d": 0.9, "u": 15.0, "c": "g"}, {"d": 1, "u": 16.5, "c": "g"}, {"d": 1.25, "u": 21.0, "c": "g"}, {"d": 1.5, "u": 25.0, "c": "g"}, {"d": 1.75, "u": 29.0, "c": "g"}, {"d": 2, "u": 33.5, "c": "y"}, {"d": 2.5, "u": 41.5, "c": "y"}, {"d": 3, "u": 50.0, "c": "y"}, {"d": 4, "u": 66.5, "c": "o"}, {"d": 5, "u": 83.5, "c": "o"}, {"d": 6, "u": 100.0, "c": "o"}]}, {"v": 6, "b": 120, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 2.0, "c": "o"}, {"d": 0.125, "u": 3.0, "c": "o"}, {"d": 0.15, "u": 3.0, "c": "y"}, {"d": 0.2, "u": 4.0, "c": "y"}, {"d": 0.25, "u": 5.0, "c": "g"}, {"d": 0.3, "u": 6.0, "c": "g"}, {"d": 0.4, "u": 8.0, "c": "g"}, {"d": 0.5, "u": 10.0, "c": "g"}, {"d": 0.6, "u": 12.0, "c": "g"}, {"d": 0.75, "u": 15.0, "c": "g"}, {"d": 0.9, "u": 18.0, "c": "g"}, {"d": 1, "u": 20.0, "c": "g"}, {"d": 1.25, "u": 25.0, "c": "g"}, {"d": 1.5, "u": 30.0, "c": "g"}, {"d": 1.75, "u": 35.0, "c": "y"}, {"d": 2, "u": 40.0, "c": "y"}, {"d": 2.5, "u": 50.0, "c": "y"}, {"d": 3, "u": 60.0, "c": "o"}, {"d": 4, "u": 80.0, "c": "o"}, {"d": 5, "u": 100.0, "c": "r"}, {"d": 6, "u": 120.0, "c": "r"}]}, {"v": 6, "b": 150, "cells": [{"d": 0.05, "u": 1.5, "c": "o"}, {"d": 0.1, "u": 2.5, "c": "o"}, {"d": 0.125, "u": 3.0, "c": "y"}, {"d": 0.15, "u": 4.0, "c": "y"}, {"d": 0.2, "u": 5.0, "c": "g"}, {"d": 0.25, "u": 6.5, "c": "g"}, {"d": 0.3, "u": 7.5, "c": "g"}, {"d": 0.4, "u": 10.0, "c": "g"}, {"d": 0.5, "u": 12.5, "c": "g"}, {"d": 0.6, "u": 15.0, "c": "g"}, {"d": 0.75, "u": 19.0, "c": "g"}, {"d": 0.9, "u": 22.5, "c": "g"}, {"d": 1, "u": 25.0, "c": "g"}, {"d": 1.25, "u": 31.5, "c": "y"}, {"d": 1.5, "u": 37.5, "c": "y"}, {"d": 1.75, "u": 44.0, "c": "y"}, {"d": 2, "u": 50.0, "c": "y"}, {"d": 2.5, "u": 62.5, "c": "o"}, {"d": 3, "u": 75.0, "c": "o"}, {"d": 4, "u": 100.0, "c": "o"}, {"d": 5, "u": 125.0, "c": "r"}, {"d": 6, "u": 150.0, "c": "r"}]}, {"v": 6, "b": 200, "cells": [{"d": 0.05, "u": 1.5, "c": "o"}, {"d": 0.1, "u": 3.5, "c": "y"}, {"d": 0.125, "u": 4.0, "c": "y"}, {"d": 0.15, "u": 5.0, "c": "g"}, {"d": 0.2, "u": 6.5, "c": "g"}, {"d": 0.25, "u": 8.5, "c": "g"}, {"d": 0.3, "u": 10.0, "c": "g"}, {"d": 0.4, "u": 13.5, "c": "g"}, {"d": 0.5, "u": 16.5, "c": "g"}, {"d": 0.6, "u": 20.0, "c": "g"}, {"d": 0.75, "u": 25.0, "c": "g"}, {"d": 0.9, "u": 30.0, "c": "g"}, {"d": 1, "u": 33.5, "c": "y"}, {"d": 1.25, "u": 41.5, "c": "y"}, {"d": 1.5, "u": 50.0, "c": "y"}, {"d": 1.75, "u": 58.5, "c": "o"}, {"d": 2, "u": 66.5, "c": "o"}, {"d": 2.5, "u": 83.5, "c": "o"}, {"d": 3, "u": 100.0, "c": "o"}, {"d": 4, "u": 133.5, "c": "r"}, {"d": 5, "u": 166.5, "c": "r"}, {"d": 6, "u": 200.0, "c": "r"}]}, {"v": 6, "b": 250, "cells": [{"d": 0.05, "u": 2.0, "c": "o"}, {"d": 0.1, "u": 4.0, "c": "y"}, {"d": 0.125, "u": 5.0, "c": "g"}, {"d": 0.15, "u": 6.5, "c": "g"}, {"d": 0.2, "u": 8.5, "c": "g"}, {"d": 0.25, "u": 10.5, "c": "g"}, {"d": 0.3, "u": 12.5, "c": "g"}, {"d": 0.4, "u": 16.5, "c": "g"}, {"d": 0.5, "u": 21.0, "c": "g"}, {"d": 0.6, "u": 25.0, "c": "g"}, {"d": 0.75, "u": 31.5, "c": "y"}, {"d": 0.9, "u": 37.5, "c": "y"}, {"d": 1, "u": 41.5, "c": "y"}, {"d": 1.25, "u": 52.0, "c": "o"}, {"d": 1.5, "u": 62.5, "c": "o"}, {"d": 1.75, "u": 73.0, "c": "o"}, {"d": 2, "u": 83.5, "c": "o"}, {"d": 2.5, "u": 104.0, "c": "r"}, {"d": 3, "u": 125.0, "c": "r"}, {"d": 4, "u": 166.5, "c": "r"}, {"d": 5, "u": 208.5, "c": "r"}, {"d": 6, "u": 250.0, "c": "r"}]}, {"v": 6, "b": 300, "cells": [{"d": 0.05, "u": 2.5, "c": "o"}, {"d": 0.1, "u": 5.0, "c": "g"}, {"d": 0.125, "u": 6.5, "c": "g"}, {"d": 0.15, "u": 7.5, "c": "g"}, {"d": 0.2, "u": 10.0, "c": "g"}, {"d": 0.25, "u": 12.5, "c": "g"}, {"d": 0.3, "u": 15.0, "c": "g"}, {"d": 0.4, "u": 20.0, "c": "g"}, {"d": 0.5, "u": 25.0, "c": "g"}, {"d": 0.6, "u": 30.0, "c": "g"}, {"d": 0.75, "u": 37.5, "c": "y"}, {"d": 0.9, "u": 45.0, "c": "y"}, {"d": 1, "u": 50.0, "c": "y"}, {"d": 1.25, "u": 62.5, "c": "o"}, {"d": 1.5, "u": 75.0, "c": "o"}, {"d": 1.75, "u": 87.5, "c": "o"}, {"d": 2, "u": 100.0, "c": "o"}, {"d": 2.5, "u": 125.0, "c": "r"}, {"d": 3, "u": 150.0, "c": "r"}, {"d": 4, "u": 200.0, "c": "r"}, {"d": 5, "u": 250.0, "c": "r"}, {"d": 6, "u": 300.0, "c": "r"}]}, {"v": 6, "b": 400, "cells": [{"d": 0.05, "u": 3.5, "c": "y"}, {"d": 0.1, "u": 6.5, "c": "g"}, {"d": 0.125, "u": 8.5, "c": "g"}, {"d": 0.15, "u": 10.0, "c": "g"}, {"d": 0.2, "u": 13.5, "c": "g"}, {"d": 0.25, "u": 16.5, "c": "g"}, {"d": 0.3, "u": 20.0, "c": "g"}, {"d": 0.4, "u": 26.5, "c": "g"}, {"d": 0.5, "u": 33.5, "c": "y"}, {"d": 0.6, "u": 40.0, "c": "y"}, {"d": 0.75, "u": 50.0, "c": "y"}, {"d": 0.9, "u": 60.0, "c": "o"}, {"d": 1, "u": 66.5, "c": "o"}, {"d": 1.25, "u": 83.5, "c": "o"}, {"d": 1.5, "u": 100.0, "c": "o"}, {"d": 1.75, "u": 116.5, "c": "r"}, {"d": 2, "u": 133.5, "c": "r"}, {"d": 2.5, "u": 166.5, "c": "r"}, {"d": 3, "u": 200.0, "c": "r"}, {"d": 4, "u": 266.5, "c": "r"}, {"d": 5, "u": 333.5, "c": "r"}, {"d": 6, "u": 400.0, "c": "r"}]}, {"v": 6, "b": 500, "cells": [{"d": 0.05, "u": 4.0, "c": "y"}, {"d": 0.1, "u": 8.5, "c": "g"}, {"d": 0.125, "u": 10.5, "c": "g"}, {"d": 0.15, "u": 12.5, "c": "g"}, {"d": 0.2, "u": 16.5, "c": "g"}, {"d": 0.25, "u": 21.0, "c": "g"}, {"d": 0.3, "u": 25.0, "c": "g"}, {"d": 0.4, "u": 33.5, "c": "y"}, {"d": 0.5, "u": 41.5, "c": "y"}, {"d": 0.6, "u": 50.0, "c": "y"}, {"d": 0.75, "u": 62.5, "c": "o"}, {"d": 0.9, "u": 75.0, "c": "o"}, {"d": 1, "u": 83.5, "c": "o"}, {"d": 1.25, "u": 104.0, "c": "r"}, {"d": 1.5, "u": 125.0, "c": "r"}, {"d": 1.75, "u": 146.0, "c": "r"}, {"d": 2, "u": 166.5, "c": "r"}, {"d": 2.5, "u": 208.5, "c": "r"}, {"d": 3, "u": 250.0, "c": "r"}, {"d": 4, "u": 333.5, "c": "r"}, {"d": 5, "u": 416.5, "c": "r"}, {"d": 6, "u": 500.0, "c": "r"}]}, {"v": 7, "b": 70, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "o"}, {"d": 0.125, "u": 1.5, "c": "o"}, {"d": 0.15, "u": 1.5, "c": "o"}, {"d": 0.2, "u": 2.0, "c": "o"}, {"d": 0.25, "u": 2.5, "c": "o"}, {"d": 0.3, "u": 3.0, "c": "y"}, {"d": 0.4, "u": 4.0, "c": "y"}, {"d": 0.5, "u": 5.0, "c": "g"}, {"d": 0.6, "u": 6.0, "c": "g"}, {"d": 0.75, "u": 7.5, "c": "g"}, {"d": 0.9, "u": 9.0, "c": "g"}, {"d": 1, "u": 10.0, "c": "g"}, {"d": 1.25, "u": 12.5, "c": "g"}, {"d": 1.5, "u": 15.0, "c": "g"}, {"d": 1.75, "u": 17.5, "c": "g"}, {"d": 2, "u": 20.0, "c": "g"}, {"d": 2.5, "u": 25.0, "c": "g"}, {"d": 3, "u": 30.0, "c": "g"}, {"d": 4, "u": 40.0, "c": "y"}, {"d": 5, "u": 50.0, "c": "y"}, {"d": 6, "u": 60.0, "c": "o"}]}, {"v": 7, "b": 100, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.5, "c": "o"}, {"d": 0.125, "u": 2.0, "c": "o"}, {"d": 0.15, "u": 2.0, "c": "o"}, {"d": 0.2, "u": 3.0, "c": "y"}, {"d": 0.25, "u": 3.5, "c": "y"}, {"d": 0.3, "u": 4.5, "c": "y"}, {"d": 0.4, "u": 5.5, "c": "g"}, {"d": 0.5, "u": 7.0, "c": "g"}, {"d": 0.6, "u": 8.5, "c": "g"}, {"d": 0.75, "u": 10.5, "c": "g"}, {"d": 0.9, "u": 13.0, "c": "g"}, {"d": 1, "u": 14.5, "c": "g"}, {"d": 1.25, "u": 18.0, "c": "g"}, {"d": 1.5, "u": 21.5, "c": "g"}, {"d": 1.75, "u": 25.0, "c": "g"}, {"d": 2, "u": 28.5, "c": "g"}, {"d": 2.5, "u": 35.5, "c": "y"}, {"d": 3, "u": 43.0, "c": "y"}, {"d": 4, "u": 57.0, "c": "o"}, {"d": 5, "u": 71.5, "c": "o"}, {"d": 6, "u": 85.5, "c": "o"}]}, {"v": 7, "b": 125, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 2.0, "c": "o"}, {"d": 0.125, "u": 2.0, "c": "o"}, {"d": 0.15, "u": 2.5, "c": "o"}, {"d": 0.2, "u": 3.5, "c": "y"}, {"d": 0.25, "u": 4.5, "c": "y"}, {"d": 0.3, "u": 5.5, "c": "g"}, {"d": 0.4, "u": 7.0, "c": "g"}, {"d": 0.5, "u": 9.0, "c": "g"}, {"d": 0.6, "u": 10.5, "c": "g"}, {"d": 0.75, "u": 13.5, "c": "g"}, {"d": 0.9, "u": 16.0, "c": "g"}, {"d": 1, "u": 18.0, "c": "g"}, {"d": 1.25, "u": 22.5, "c": "g"}, {"d": 1.5, "u": 27.0, "c": "g"}, {"d": 1.75, "u": 31.5, "c": "y"}, {"d": 2, "u": 35.5, "c": "y"}, {"d": 2.5, "u": 44.5, "c": "y"}, {"d": 3, "u": 53.5, "c": "o"}, {"d": 4, "u": 71.5, "c": "o"}, {"d": 5, "u": 89.5, "c": "o"}, {"d": 6, "u": 107.0, "c": "r"}]}, {"v": 7, "b": 140, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 2.0, "c": "o"}, {"d": 0.125, "u": 2.5, "c": "o"}, {"d": 0.15, "u": 3.0, "c": "y"}, {"d": 0.2, "u": 4.0, "c": "y"}, {"d": 0.25, "u": 5.0, "c": "g"}, {"d": 0.3, "u": 6.0, "c": "g"}, {"d": 0.4, "u": 8.0, "c": "g"}, {"d": 0.5, "u": 10.0, "c": "g"}, {"d": 0.6, "u": 12.0, "c": "g"}, {"d": 0.75, "u": 15.0, "c": "g"}, {"d": 0.9, "u": 18.0, "c": "g"}, {"d": 1, "u": 20.0, "c": "g"}, {"d": 1.25, "u": 25.0, "c": "g"}, {"d": 1.5, "u": 30.0, "c": "g"}, {"d": 1.75, "u": 35.0, "c": "y"}, {"d": 2, "u": 40.0, "c": "y"}, {"d": 2.5, "u": 50.0, "c": "y"}, {"d": 3, "u": 60.0, "c": "o"}, {"d": 4, "u": 80.0, "c": "o"}, {"d": 5, "u": 100.0, "c": "r"}, {"d": 6, "u": 120.0, "c": "r"}]}, {"v": 7, "b": 200, "cells": [{"d": 0.05, "u": 1.5, "c": "o"}, {"d": 0.1, "u": 3.0, "c": "y"}, {"d": 0.125, "u": 3.5, "c": "y"}, {"d": 0.15, "u": 4.5, "c": "y"}, {"d": 0.2, "u": 5.5, "c": "g"}, {"d": 0.25, "u": 7.0, "c": "g"}, {"d": 0.3, "u": 8.5, "c": "g"}, {"d": 0.4, "u": 11.5, "c": "g"}, {"d": 0.5, "u": 14.5, "c": "g"}, {"d": 0.6, "u": 17.0, "c": "g"}, {"d": 0.75, "u": 21.5, "c": "g"}, {"d": 0.9, "u": 25.5, "c": "g"}, {"d": 1, "u": 28.5, "c": "g"}, {"d": 1.25, "u": 35.5, "c": "y"}, {"d": 1.5, "u": 43.0, "c": "y"}, {"d": 1.75, "u": 50.0, "c": "y"}, {"d": 2, "u": 57.0, "c": "o"}, {"d": 2.5, "u": 71.5, "c": "o"}, {"d": 3, "u": 85.5, "c": "o"}, {"d": 4, "u": 114.5, "c": "r"}, {"d": 5, "u": 143.0, "c": "r"}, {"d": 6, "u": 171.5, "c": "r"}]}, {"v": 7, "b": 250, "cells": [{"d": 0.05, "u": 2.0, "c": "o"}, {"d": 0.1, "u": 3.5, "c": "y"}, {"d": 0.125, "u": 4.5, "c": "y"}, {"d": 0.15, "u": 5.5, "c": "g"}, {"d": 0.2, "u": 7.0, "c": "g"}, {"d": 0.25, "u": 9.0, "c": "g"}, {"d": 0.3, "u": 10.5, "c": "g"}, {"d": 0.4, "u": 14.5, "c": "g"}, {"d": 0.5, "u": 18.0, "c": "g"}, {"d": 0.6, "u": 21.5, "c": "g"}, {"d": 0.75, "u": 27.0, "c": "g"}, {"d": 0.9, "u": 32.0, "c": "y"}, {"d": 1, "u": 35.5, "c": "y"}, {"d": 1.25, "u": 44.5, "c": "y"}, {"d": 1.5, "u": 53.5, "c": "o"}, {"d": 1.75, "u": 62.5, "c": "o"}, {"d": 2, "u": 71.5, "c": "o"}, {"d": 2.5, "u": 89.5, "c": "o"}, {"d": 3, "u": 107.0, "c": "r"}, {"d": 4, "u": 143.0, "c": "r"}, {"d": 5, "u": 178.5, "c": "r"}, {"d": 6, "u": 214.5, "c": "r"}]}, {"v": 7, "b": 300, "cells": [{"d": 0.05, "u": 2.0, "c": "o"}, {"d": 0.1, "u": 4.5, "c": "y"}, {"d": 0.125, "u": 5.5, "c": "g"}, {"d": 0.15, "u": 6.5, "c": "g"}, {"d": 0.2, "u": 8.5, "c": "g"}, {"d": 0.25, "u": 10.5, "c": "g"}, {"d": 0.3, "u": 13.0, "c": "g"}, {"d": 0.4, "u": 17.0, "c": "g"}, {"d": 0.5, "u": 21.5, "c": "g"}, {"d": 0.6, "u": 25.5, "c": "g"}, {"d": 0.75, "u": 32.0, "c": "y"}, {"d": 0.9, "u": 38.5, "c": "y"}, {"d": 1, "u": 43.0, "c": "y"}, {"d": 1.25, "u": 53.5, "c": "o"}, {"d": 1.5, "u": 64.5, "c": "o"}, {"d": 1.75, "u": 75.0, "c": "o"}, {"d": 2, "u": 85.5, "c": "o"}, {"d": 2.5, "u": 107.0, "c": "r"}, {"d": 3, "u": 128.5, "c": "r"}, {"d": 4, "u": 171.5, "c": "r"}, {"d": 5, "u": 214.5, "c": "r"}, {"d": 6, "u": 257.0, "c": "r"}]}, {"v": 7, "b": 400, "cells": [{"d": 0.05, "u": 3.0, "c": "y"}, {"d": 0.1, "u": 5.5, "c": "g"}, {"d": 0.125, "u": 7.0, "c": "g"}, {"d": 0.15, "u": 8.5, "c": "g"}, {"d": 0.2, "u": 11.5, "c": "g"}, {"d": 0.25, "u": 14.5, "c": "g"}, {"d": 0.3, "u": 17.0, "c": "g"}, {"d": 0.4, "u": 23.0, "c": "g"}, {"d": 0.5, "u": 28.5, "c": "g"}, {"d": 0.6, "u": 34.5, "c": "y"}, {"d": 0.75, "u": 43.0, "c": "y"}, {"d": 0.9, "u": 51.5, "c": "o"}, {"d": 1, "u": 57.0, "c": "o"}, {"d": 1.25, "u": 71.5, "c": "o"}, {"d": 1.5, "u": 85.5, "c": "o"}, {"d": 1.75, "u": 100.0, "c": "o"}, {"d": 2, "u": 114.5, "c": "r"}, {"d": 2.5, "u": 143.0, "c": "r"}, {"d": 3, "u": 171.5, "c": "r"}, {"d": 4, "u": 228.5, "c": "r"}, {"d": 5, "u": 285.5, "c": "r"}, {"d": 6, "u": 343.0, "c": "r"}]}, {"v": 7, "b": 500, "cells": [{"d": 0.05, "u": 3.5, "c": "y"}, {"d": 0.1, "u": 7.0, "c": "g"}, {"d": 0.125, "u": 9.0, "c": "g"}, {"d": 0.15, "u": 10.5, "c": "g"}, {"d": 0.2, "u": 14.5, "c": "g"}, {"d": 0.25, "u": 18.0, "c": "g"}, {"d": 0.3, "u": 21.5, "c": "g"}, {"d": 0.4, "u": 28.5, "c": "g"}, {"d": 0.5, "u": 35.5, "c": "y"}, {"d": 0.6, "u": 43.0, "c": "y"}, {"d": 0.75, "u": 53.5, "c": "o"}, {"d": 0.9, "u": 64.5, "c": "o"}, {"d": 1, "u": 71.5, "c": "o"}, {"d": 1.25, "u": 89.5, "c": "o"}, {"d": 1.5, "u": 107.0, "c": "r"}, {"d": 1.75, "u": 125.0, "c": "r"}, {"d": 2, "u": 143.0, "c": "r"}, {"d": 2.5, "u": 178.5, "c": "r"}, {"d": 3, "u": 214.5, "c": "r"}, {"d": 4, "u": 285.5, "c": "r"}, {"d": 5, "u": 357.0, "c": "r"}, {"d": 6, "u": 428.5, "c": "r"}]}, {"v": 8, "b": 80, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "o"}, {"d": 0.125, "u": 1.5, "c": "o"}, {"d": 0.15, "u": 1.5, "c": "o"}, {"d": 0.2, "u": 2.0, "c": "o"}, {"d": 0.25, "u": 2.5, "c": "o"}, {"d": 0.3, "u": 3.0, "c": "y"}, {"d": 0.4, "u": 4.0, "c": "y"}, {"d": 0.5, "u": 5.0, "c": "g"}, {"d": 0.6, "u": 6.0, "c": "g"}, {"d": 0.75, "u": 7.5, "c": "g"}, {"d": 0.9, "u": 9.0, "c": "g"}, {"d": 1, "u": 10.0, "c": "g"}, {"d": 1.25, "u": 12.5, "c": "g"}, {"d": 1.5, "u": 15.0, "c": "g"}, {"d": 1.75, "u": 17.5, "c": "g"}, {"d": 2, "u": 20.0, "c": "g"}, {"d": 2.5, "u": 25.0, "c": "g"}, {"d": 3, "u": 30.0, "c": "g"}, {"d": 4, "u": 40.0, "c": "y"}, {"d": 5, "u": 50.0, "c": "y"}, {"d": 6, "u": 60.0, "c": "o"}, {"d": 7.5, "u": 75.0, "c": "o"}, {"d": 8, "u": 80.0, "c": "o"}]}, {"v": 8, "b": 100, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.5, "c": "o"}, {"d": 0.125, "u": 1.5, "c": "o"}, {"d": 0.15, "u": 2.0, "c": "o"}, {"d": 0.2, "u": 2.5, "c": "o"}, {"d": 0.25, "u": 3.0, "c": "y"}, {"d": 0.3, "u": 4.0, "c": "y"}, {"d": 0.4, "u": 5.0, "c": "g"}, {"d": 0.5, "u": 6.5, "c": "g"}, {"d": 0.6, "u": 7.5, "c": "g"}, {"d": 0.75, "u": 9.5, "c": "g"}, {"d": 0.9, "u": 11.5, "c": "g"}, {"d": 1, "u": 12.5, "c": "g"}, {"d": 1.25, "u": 15.5, "c": "g"}, {"d": 1.5, "u": 19.0, "c": "g"}, {"d": 1.75, "u": 22.0, "c": "g"}, {"d": 2, "u": 25.0, "c": "g"}, {"d": 2.5, "u": 31.5, "c": "y"}, {"d": 3, "u": 37.5, "c": "y"}, {"d": 4, "u": 50.0, "c": "y"}, {"d": 5, "u": 62.5, "c": "o"}, {"d": 6, "u": 75.0, "c": "o"}, {"d": 7.5, "u": 94.0, "c": "o"}, {"d": 8, "u": 100.0, "c": "o"}]}, {"v": 8, "b": 125, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 1.5, "c": "o"}, {"d": 0.125, "u": 2.0, "c": "o"}, {"d": 0.15, "u": 2.5, "c": "o"}, {"d": 0.2, "u": 3.0, "c": "y"}, {"d": 0.25, "u": 4.0, "c": "y"}, {"d": 0.3, "u": 4.5, "c": "y"}, {"d": 0.4, "u": 6.5, "c": "g"}, {"d": 0.5, "u": 8.0, "c": "g"}, {"d": 0.6, "u": 9.5, "c": "g"}, {"d": 0.75, "u": 11.5, "c": "g"}, {"d": 0.9, "u": 14.0, "c": "g"}, {"d": 1, "u": 15.5, "c": "g"}, {"d": 1.25, "u": 19.5, "c": "g"}, {"d": 1.5, "u": 23.5, "c": "g"}, {"d": 1.75, "u": 27.5, "c": "g"}, {"d": 2, "u": 31.5, "c": "y"}, {"d": 2.5, "u": 39.0, "c": "y"}, {"d": 3, "u": 47.0, "c": "y"}, {"d": 4, "u": 62.5, "c": "o"}, {"d": 5, "u": 78.0, "c": "o"}, {"d": 6, "u": 94.0, "c": "o"}, {"d": 7.5, "u": 117.0, "c": "r"}, {"d": 8, "u": 125.0, "c": "r"}]}, {"v": 8, "b": 160, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 2.0, "c": "o"}, {"d": 0.125, "u": 2.5, "c": "o"}, {"d": 0.15, "u": 3.0, "c": "y"}, {"d": 0.2, "u": 4.0, "c": "y"}, {"d": 0.25, "u": 5.0, "c": "g"}, {"d": 0.3, "u": 6.0, "c": "g"}, {"d": 0.4, "u": 8.0, "c": "g"}, {"d": 0.5, "u": 10.0, "c": "g"}, {"d": 0.6, "u": 12.0, "c": "g"}, {"d": 0.75, "u": 15.0, "c": "g"}, {"d": 0.9, "u": 18.0, "c": "g"}, {"d": 1, "u": 20.0, "c": "g"}, {"d": 1.25, "u": 25.0, "c": "g"}, {"d": 1.5, "u": 30.0, "c": "g"}, {"d": 1.75, "u": 35.0, "c": "y"}, {"d": 2, "u": 40.0, "c": "y"}, {"d": 2.5, "u": 50.0, "c": "y"}, {"d": 3, "u": 60.0, "c": "o"}, {"d": 4, "u": 80.0, "c": "o"}, {"d": 5, "u": 100.0, "c": "o"}, {"d": 6, "u": 120.0, "c": "r"}, {"d": 7.5, "u": 150.0, "c": "r"}, {"d": 8, "u": 160.0, "c": "r"}]}, {"v": 8, "b": 200, "cells": [{"d": 0.05, "u": 1.5, "c": "o"}, {"d": 0.1, "u": 2.5, "c": "o"}, {"d": 0.125, "u": 3.0, "c": "y"}, {"d": 0.15, "u": 4.0, "c": "y"}, {"d": 0.2, "u": 5.0, "c": "g"}, {"d": 0.25, "u": 6.5, "c": "g"}, {"d": 0.3, "u": 7.5, "c": "g"}, {"d": 0.4, "u": 10.0, "c": "g"}, {"d": 0.5, "u": 12.5, "c": "g"}, {"d": 0.6, "u": 15.0, "c": "g"}, {"d": 0.75, "u": 19.0, "c": "g"}, {"d": 0.9, "u": 22.5, "c": "g"}, {"d": 1, "u": 25.0, "c": "g"}, {"d": 1.25, "u": 31.5, "c": "y"}, {"d": 1.5, "u": 37.5, "c": "y"}, {"d": 1.75, "u": 44.0, "c": "y"}, {"d": 2, "u": 50.0, "c": "y"}, {"d": 2.5, "u": 62.5, "c": "o"}, {"d": 3, "u": 75.0, "c": "o"}, {"d": 4, "u": 100.0, "c": "o"}, {"d": 5, "u": 125.0, "c": "r"}, {"d": 6, "u": 150.0, "c": "r"}, {"d": 7.5, "u": 187.5, "c": "r"}, {"d": 8, "u": 200.0, "c": "r"}]}, {"v": 8, "b": 250, "cells": [{"d": 0.05, "u": 1.5, "c": "o"}, {"d": 0.1, "u": 3.0, "c": "y"}, {"d": 0.125, "u": 4.0, "c": "y"}, {"d": 0.15, "u": 4.5, "c": "y"}, {"d": 0.2, "u": 6.5, "c": "g"}, {"d": 0.25, "u": 8.0, "c": "g"}, {"d": 0.3, "u": 9.5, "c": "g"}, {"d": 0.4, "u": 12.5, "c": "g"}, {"d": 0.5, "u": 15.5, "c": "g"}, {"d": 0.6, "u": 19.0, "c": "g"}, {"d": 0.75, "u": 23.5, "c": "g"}, {"d": 0.9, "u": 28.0, "c": "g"}, {"d": 1, "u": 31.5, "c": "y"}, {"d": 1.25, "u": 39.0, "c": "y"}, {"d": 1.5, "u": 47.0, "c": "y"}, {"d": 1.75, "u": 54.5, "c": "o"}, {"d": 2, "u": 62.5, "c": "o"}, {"d": 2.5, "u": 78.0, "c": "o"}, {"d": 3, "u": 94.0, "c": "o"}, {"d": 4, "u": 125.0, "c": "r"}, {"d": 5, "u": 156.5, "c": "r"}, {"d": 6, "u": 187.5, "c": "r"}, {"d": 7.5, "u": 234.5, "c": "r"}, {"d": 8, "u": 250.0, "c": "r"}]}, {"v": 8, "b": 300, "cells": [{"d": 0.05, "u": 2.0, "c": "o"}, {"d": 0.1, "u": 4.0, "c": "y"}, {"d": 0.125, "u": 4.5, "c": "y"}, {"d": 0.15, "u": 5.5, "c": "g"}, {"d": 0.2, "u": 7.5, "c": "g"}, {"d": 0.25, "u": 9.5, "c": "g"}, {"d": 0.3, "u": 11.5, "c": "g"}, {"d": 0.4, "u": 15.0, "c": "g"}, {"d": 0.5, "u": 19.0, "c": "g"}, {"d": 0.6, "u": 22.5, "c": "g"}, {"d": 0.75, "u": 28.0, "c": "g"}, {"d": 0.9, "u": 34.0, "c": "y"}, {"d": 1, "u": 37.5, "c": "y"}, {"d": 1.25, "u": 47.0, "c": "y"}, {"d": 1.5, "u": 56.5, "c": "o"}, {"d": 1.75, "u": 65.5, "c": "o"}, {"d": 2, "u": 75.0, "c": "o"}, {"d": 2.5, "u": 94.0, "c": "o"}, {"d": 3, "u": 112.5, "c": "r"}, {"d": 4, "u": 150.0, "c": "r"}, {"d": 5, "u": 187.5, "c": "r"}, {"d": 6, "u": 225.0, "c": "r"}, {"d": 7.5, "u": 281.5, "c": "r"}, {"d": 8, "u": 300.0, "c": "r"}]}, {"v": 8, "b": 400, "cells": [{"d": 0.05, "u": 2.5, "c": "o"}, {"d": 0.1, "u": 5.0, "c": "g"}, {"d": 0.125, "u": 6.5, "c": "g"}, {"d": 0.15, "u": 7.5, "c": "g"}, {"d": 0.2, "u": 10.0, "c": "g"}, {"d": 0.25, "u": 12.5, "c": "g"}, {"d": 0.3, "u": 15.0, "c": "g"}, {"d": 0.4, "u": 20.0, "c": "g"}, {"d": 0.5, "u": 25.0, "c": "g"}, {"d": 0.6, "u": 30.0, "c": "g"}, {"d": 0.75, "u": 37.5, "c": "y"}, {"d": 0.9, "u": 45.0, "c": "y"}, {"d": 1, "u": 50.0, "c": "y"}, {"d": 1.25, "u": 62.5, "c": "o"}, {"d": 1.5, "u": 75.0, "c": "o"}, {"d": 1.75, "u": 87.5, "c": "o"}, {"d": 2, "u": 100.0, "c": "o"}, {"d": 2.5, "u": 125.0, "c": "r"}, {"d": 3, "u": 150.0, "c": "r"}, {"d": 4, "u": 200.0, "c": "r"}, {"d": 5, "u": 250.0, "c": "r"}, {"d": 6, "u": 300.0, "c": "r"}, {"d": 7.5, "u": 375.0, "c": "r"}, {"d": 8, "u": 400.0, "c": "r"}]}, {"v": 8, "b": 500, "cells": [{"d": 0.05, "u": 3.0, "c": "y"}, {"d": 0.1, "u": 6.5, "c": "g"}, {"d": 0.125, "u": 8.0, "c": "g"}, {"d": 0.15, "u": 9.5, "c": "g"}, {"d": 0.2, "u": 12.5, "c": "g"}, {"d": 0.25, "u": 15.5, "c": "g"}, {"d": 0.3, "u": 19.0, "c": "g"}, {"d": 0.4, "u": 25.0, "c": "g"}, {"d": 0.5, "u": 31.5, "c": "y"}, {"d": 0.6, "u": 37.5, "c": "y"}, {"d": 0.75, "u": 47.0, "c": "y"}, {"d": 0.9, "u": 56.5, "c": "o"}, {"d": 1, "u": 62.5, "c": "o"}, {"d": 1.25, "u": 78.0, "c": "o"}, {"d": 1.5, "u": 94.0, "c": "o"}, {"d": 1.75, "u": 109.5, "c": "r"}, {"d": 2, "u": 125.0, "c": "r"}, {"d": 2.5, "u": 156.5, "c": "r"}, {"d": 3, "u": 187.5, "c": "r"}, {"d": 4, "u": 250.0, "c": "r"}, {"d": 5, "u": 312.5, "c": "r"}, {"d": 6, "u": 375.0, "c": "r"}, {"d": 7.5, "u": 469.0, "c": "r"}, {"d": 8, "u": 500.0, "c": "r"}]}, {"v": 10, "b": 50, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 0.5, "c": "r"}, {"d": 0.15, "u": 1.0, "c": "o"}, {"d": 0.2, "u": 1.0, "c": "o"}, {"d": 0.25, "u": 1.5, "c": "o"}, {"d": 0.3, "u": 1.5, "c": "o"}, {"d": 0.4, "u": 2.0, "c": "o"}, {"d": 0.5, "u": 2.5, "c": "o"}, {"d": 0.6, "u": 3.0, "c": "y"}, {"d": 0.75, "u": 4.0, "c": "y"}, {"d": 0.9, "u": 4.5, "c": "y"}, {"d": 1, "u": 5.0, "c": "g"}, {"d": 1.25, "u": 6.5, "c": "g"}, {"d": 1.5, "u": 7.5, "c": "g"}, {"d": 1.75, "u": 9.0, "c": "g"}, {"d": 2, "u": 10.0, "c": "g"}, {"d": 2.5, "u": 12.5, "c": "g"}, {"d": 3, "u": 15.0, "c": "g"}, {"d": 4, "u": 20.0, "c": "g"}, {"d": 5, "u": 25.0, "c": "g"}, {"d": 6, "u": 30.0, "c": "g"}, {"d": 7.5, "u": 37.5, "c": "y"}, {"d": 8, "u": 40.0, "c": "y"}, {"d": 9, "u": 45.0, "c": "y"}, {"d": 10, "u": 50.0, "c": "y"}]}, {"v": 10, "b": 100, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "o"}, {"d": 0.125, "u": 1.5, "c": "o"}, {"d": 0.15, "u": 1.5, "c": "o"}, {"d": 0.2, "u": 2.0, "c": "o"}, {"d": 0.25, "u": 2.5, "c": "o"}, {"d": 0.3, "u": 3.0, "c": "y"}, {"d": 0.4, "u": 4.0, "c": "y"}, {"d": 0.5, "u": 5.0, "c": "g"}, {"d": 0.6, "u": 6.0, "c": "g"}, {"d": 0.75, "u": 7.5, "c": "g"}, {"d": 0.9, "u": 9.0, "c": "g"}, {"d": 1, "u": 10.0, "c": "g"}, {"d": 1.25, "u": 12.5, "c": "g"}, {"d": 1.5, "u": 15.0, "c": "g"}, {"d": 1.75, "u": 17.5, "c": "g"}, {"d": 2, "u": 20.0, "c": "g"}, {"d": 2.5, "u": 25.0, "c": "g"}, {"d": 3, "u": 30.0, "c": "g"}, {"d": 4, "u": 40.0, "c": "y"}, {"d": 5, "u": 50.0, "c": "y"}, {"d": 6, "u": 60.0, "c": "o"}, {"d": 7.5, "u": 75.0, "c": "o"}, {"d": 8, "u": 80.0, "c": "o"}, {"d": 9, "u": 90.0, "c": "o"}, {"d": 10, "u": 100.0, "c": "o"}]}, {"v": 10, "b": 125, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.5, "c": "o"}, {"d": 0.125, "u": 1.5, "c": "o"}, {"d": 0.15, "u": 2.0, "c": "o"}, {"d": 0.2, "u": 2.5, "c": "o"}, {"d": 0.25, "u": 3.0, "c": "y"}, {"d": 0.3, "u": 4.0, "c": "y"}, {"d": 0.4, "u": 5.0, "c": "g"}, {"d": 0.5, "u": 6.5, "c": "g"}, {"d": 0.6, "u": 7.5, "c": "g"}, {"d": 0.75, "u": 9.5, "c": "g"}, {"d": 0.9, "u": 11.5, "c": "g"}, {"d": 1, "u": 12.5, "c": "g"}, {"d": 1.25, "u": 15.5, "c": "g"}, {"d": 1.5, "u": 19.0, "c": "g"}, {"d": 1.75, "u": 22.0, "c": "g"}, {"d": 2, "u": 25.0, "c": "g"}, {"d": 2.5, "u": 31.5, "c": "y"}, {"d": 3, "u": 37.5, "c": "y"}, {"d": 4, "u": 50.0, "c": "y"}, {"d": 5, "u": 62.5, "c": "o"}, {"d": 6, "u": 75.0, "c": "o"}, {"d": 7.5, "u": 94.0, "c": "o"}, {"d": 8, "u": 100.0, "c": "o"}, {"d": 9, "u": 112.5, "c": "r"}, {"d": 10, "u": 125.0, "c": "r"}]}, {"v": 10, "b": 150, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 1.5, "c": "o"}, {"d": 0.125, "u": 2.0, "c": "o"}, {"d": 0.15, "u": 2.5, "c": "o"}, {"d": 0.2, "u": 3.0, "c": "y"}, {"d": 0.25, "u": 4.0, "c": "y"}, {"d": 0.3, "u": 4.5, "c": "y"}, {"d": 0.4, "u": 6.0, "c": "g"}, {"d": 0.5, "u": 7.5, "c": "g"}, {"d": 0.6, "u": 9.0, "c": "g"}, {"d": 0.75, "u": 11.5, "c": "g"}, {"d": 0.9, "u": 13.5, "c": "g"}, {"d": 1, "u": 15.0, "c": "g"}, {"d": 1.25, "u": 19.0, "c": "g"}, {"d": 1.5, "u": 22.5, "c": "g"}, {"d": 1.75, "u": 26.5, "c": "g"}, {"d": 2, "u": 30.0, "c": "g"}, {"d": 2.5, "u": 37.5, "c": "y"}, {"d": 3, "u": 45.0, "c": "y"}, {"d": 4, "u": 60.0, "c": "o"}, {"d": 5, "u": 75.0, "c": "o"}, {"d": 6, "u": 90.0, "c": "o"}, {"d": 7.5, "u": 112.5, "c": "r"}, {"d": 8, "u": 120.0, "c": "r"}, {"d": 9, "u": 135.0, "c": "r"}, {"d": 10, "u": 150.0, "c": "r"}]}, {"v": 10, "b": 200, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 2.0, "c": "o"}, {"d": 0.125, "u": 2.5, "c": "o"}, {"d": 0.15, "u": 3.0, "c": "y"}, {"d": 0.2, "u": 4.0, "c": "y"}, {"d": 0.25, "u": 5.0, "c": "g"}, {"d": 0.3, "u": 6.0, "c": "g"}, {"d": 0.4, "u": 8.0, "c": "g"}, {"d": 0.5, "u": 10.0, "c": "g"}, {"d": 0.6, "u": 12.0, "c": "g"}, {"d": 0.75, "u": 15.0, "c": "g"}, {"d": 0.9, "u": 18.0, "c": "g"}, {"d": 1, "u": 20.0, "c": "g"}, {"d": 1.25, "u": 25.0, "c": "g"}, {"d": 1.5, "u": 30.0, "c": "g"}, {"d": 1.75, "u": 35.0, "c": "y"}, {"d": 2, "u": 40.0, "c": "y"}, {"d": 2.5, "u": 50.0, "c": "y"}, {"d": 3, "u": 60.0, "c": "o"}, {"d": 4, "u": 80.0, "c": "o"}, {"d": 5, "u": 100.0, "c": "o"}, {"d": 6, "u": 120.0, "c": "r"}, {"d": 7.5, "u": 150.0, "c": "r"}, {"d": 8, "u": 160.0, "c": "r"}, {"d": 9, "u": 180.0, "c": "r"}, {"d": 10, "u": 200.0, "c": "r"}]}, {"v": 10, "b": 250, "cells": [{"d": 0.05, "u": 1.5, "c": "o"}, {"d": 0.1, "u": 2.5, "c": "o"}, {"d": 0.125, "u": 3.0, "c": "y"}, {"d": 0.15, "u": 4.0, "c": "y"}, {"d": 0.2, "u": 5.0, "c": "g"}, {"d": 0.25, "u": 6.5, "c": "g"}, {"d": 0.3, "u": 7.5, "c": "g"}, {"d": 0.4, "u": 10.0, "c": "g"}, {"d": 0.5, "u": 12.5, "c": "g"}, {"d": 0.6, "u": 15.0, "c": "g"}, {"d": 0.75, "u": 19.0, "c": "g"}, {"d": 0.9, "u": 22.5, "c": "g"}, {"d": 1, "u": 25.0, "c": "g"}, {"d": 1.25, "u": 31.5, "c": "y"}, {"d": 1.5, "u": 37.5, "c": "y"}, {"d": 1.75, "u": 44.0, "c": "y"}, {"d": 2, "u": 50.0, "c": "y"}, {"d": 2.5, "u": 62.5, "c": "o"}, {"d": 3, "u": 75.0, "c": "o"}, {"d": 4, "u": 100.0, "c": "o"}, {"d": 5, "u": 125.0, "c": "r"}, {"d": 6, "u": 150.0, "c": "r"}, {"d": 7.5, "u": 187.5, "c": "r"}, {"d": 8, "u": 200.0, "c": "r"}, {"d": 9, "u": 225.0, "c": "r"}, {"d": 10, "u": 250.0, "c": "r"}]}, {"v": 10, "b": 300, "cells": [{"d": 0.05, "u": 1.5, "c": "o"}, {"d": 0.1, "u": 3.0, "c": "y"}, {"d": 0.125, "u": 4.0, "c": "y"}, {"d": 0.15, "u": 4.5, "c": "y"}, {"d": 0.2, "u": 6.0, "c": "g"}, {"d": 0.25, "u": 7.5, "c": "g"}, {"d": 0.3, "u": 9.0, "c": "g"}, {"d": 0.4, "u": 12.0, "c": "g"}, {"d": 0.5, "u": 15.0, "c": "g"}, {"d": 0.6, "u": 18.0, "c": "g"}, {"d": 0.75, "u": 22.5, "c": "g"}, {"d": 0.9, "u": 27.0, "c": "g"}, {"d": 1, "u": 30.0, "c": "g"}, {"d": 1.25, "u": 37.5, "c": "y"}, {"d": 1.5, "u": 45.0, "c": "y"}, {"d": 1.75, "u": 52.5, "c": "o"}, {"d": 2, "u": 60.0, "c": "o"}, {"d": 2.5, "u": 75.0, "c": "o"}, {"d": 3, "u": 90.0, "c": "o"}, {"d": 4, "u": 120.0, "c": "r"}, {"d": 5, "u": 150.0, "c": "r"}, {"d": 6, "u": 180.0, "c": "r"}, {"d": 7.5, "u": 225.0, "c": "r"}, {"d": 8, "u": 240.0, "c": "r"}, {"d": 9, "u": 270.0, "c": "r"}, {"d": 10, "u": 300.0, "c": "r"}]}, {"v": 10, "b": 400, "cells": [{"d": 0.05, "u": 2.0, "c": "o"}, {"d": 0.1, "u": 4.0, "c": "y"}, {"d": 0.125, "u": 5.0, "c": "g"}, {"d": 0.15, "u": 6.0, "c": "g"}, {"d": 0.2, "u": 8.0, "c": "g"}, {"d": 0.25, "u": 10.0, "c": "g"}, {"d": 0.3, "u": 12.0, "c": "g"}, {"d": 0.4, "u": 16.0, "c": "g"}, {"d": 0.5, "u": 20.0, "c": "g"}, {"d": 0.6, "u": 24.0, "c": "g"}, {"d": 0.75, "u": 30.0, "c": "g"}, {"d": 0.9, "u": 36.0, "c": "y"}, {"d": 1, "u": 40.0, "c": "y"}, {"d": 1.25, "u": 50.0, "c": "y"}, {"d": 1.5, "u": 60.0, "c": "o"}, {"d": 1.75, "u": 70.0, "c": "o"}, {"d": 2, "u": 80.0, "c": "o"}, {"d": 2.5, "u": 100.0, "c": "o"}, {"d": 3, "u": 120.0, "c": "r"}, {"d": 4, "u": 160.0, "c": "r"}, {"d": 5, "u": 200.0, "c": "r"}, {"d": 6, "u": 240.0, "c": "r"}, {"d": 7.5, "u": 300.0, "c": "r"}, {"d": 8, "u": 320.0, "c": "r"}, {"d": 9, "u": 360.0, "c": "r"}, {"d": 10, "u": 400.0, "c": "r"}]}, {"v": 10, "b": 500, "cells": [{"d": 0.05, "u": 2.5, "c": "o"}, {"d": 0.1, "u": 5.0, "c": "g"}, {"d": 0.125, "u": 6.5, "c": "g"}, {"d": 0.15, "u": 7.5, "c": "g"}, {"d": 0.2, "u": 10.0, "c": "g"}, {"d": 0.25, "u": 12.5, "c": "g"}, {"d": 0.3, "u": 15.0, "c": "g"}, {"d": 0.4, "u": 20.0, "c": "g"}, {"d": 0.5, "u": 25.0, "c": "g"}, {"d": 0.6, "u": 30.0, "c": "g"}, {"d": 0.75, "u": 37.5, "c": "y"}, {"d": 0.9, "u": 45.0, "c": "y"}, {"d": 1, "u": 50.0, "c": "y"}, {"d": 1.25, "u": 62.5, "c": "o"}, {"d": 1.5, "u": 75.0, "c": "o"}, {"d": 1.75, "u": 87.5, "c": "o"}, {"d": 2, "u": 100.0, "c": "o"}, {"d": 2.5, "u": 125.0, "c": "r"}, {"d": 3, "u": 150.0, "c": "r"}, {"d": 4, "u": 200.0, "c": "r"}, {"d": 5, "u": 250.0, "c": "r"}, {"d": 6, "u": 300.0, "c": "r"}, {"d": 7.5, "u": 375.0, "c": "r"}, {"d": 8, "u": 400.0, "c": "r"}, {"d": 9, "u": 450.0, "c": "r"}, {"d": 10, "u": 500.0, "c": "r"}]}, {"v": 12, "b": 60, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 0.5, "c": "r"}, {"d": 0.15, "u": 1.0, "c": "o"}, {"d": 0.2, "u": 1.0, "c": "o"}, {"d": 0.25, "u": 1.5, "c": "o"}, {"d": 0.3, "u": 1.5, "c": "o"}, {"d": 0.4, "u": 2.0, "c": "o"}, {"d": 0.5, "u": 2.5, "c": "o"}, {"d": 0.6, "u": 3.0, "c": "y"}, {"d": 0.75, "u": 4.0, "c": "y"}, {"d": 0.9, "u": 4.5, "c": "y"}, {"d": 1, "u": 5.0, "c": "g"}, {"d": 1.25, "u": 6.5, "c": "g"}, {"d": 1.5, "u": 7.5, "c": "g"}, {"d": 1.75, "u": 9.0, "c": "g"}, {"d": 2, "u": 10.0, "c": "g"}, {"d": 2.5, "u": 12.5, "c": "g"}, {"d": 3, "u": 15.0, "c": "g"}, {"d": 4, "u": 20.0, "c": "g"}, {"d": 5, "u": 25.0, "c": "g"}, {"d": 6, "u": 30.0, "c": "g"}, {"d": 7.5, "u": 37.5, "c": "y"}, {"d": 8, "u": 40.0, "c": "y"}, {"d": 9, "u": 45.0, "c": "y"}, {"d": 10, "u": 50.0, "c": "y"}, {"d": 11, "u": 55.0, "c": "o"}, {"d": 12, "u": 60.0, "c": "o"}]}, {"v": 12, "b": 100, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "o"}, {"d": 0.125, "u": 1.0, "c": "o"}, {"d": 0.15, "u": 1.5, "c": "o"}, {"d": 0.2, "u": 1.5, "c": "o"}, {"d": 0.25, "u": 2.0, "c": "o"}, {"d": 0.3, "u": 2.5, "c": "o"}, {"d": 0.4, "u": 3.5, "c": "y"}, {"d": 0.5, "u": 4.0, "c": "y"}, {"d": 0.6, "u": 5.0, "c": "g"}, {"d": 0.75, "u": 6.5, "c": "g"}, {"d": 0.9, "u": 7.5, "c": "g"}, {"d": 1, "u": 8.5, "c": "g"}, {"d": 1.25, "u": 10.5, "c": "g"}, {"d": 1.5, "u": 12.5, "c": "g"}, {"d": 1.75, "u": 14.5, "c": "g"}, {"d": 2, "u": 16.5, "c": "g"}, {"d": 2.5, "u": 21.0, "c": "g"}, {"d": 3, "u": 25.0, "c": "g"}, {"d": 4, "u": 33.5, "c": "y"}, {"d": 5, "u": 41.5, "c": "y"}, {"d": 6, "u": 50.0, "c": "y"}, {"d": 7.5, "u": 62.5, "c": "o"}, {"d": 8, "u": 66.5, "c": "o"}, {"d": 9, "u": 75.0, "c": "o"}, {"d": 10, "u": 83.5, "c": "o"}, {"d": 11, "u": 91.5, "c": "o"}, {"d": 12, "u": 100.0, "c": "o"}]}, {"v": 12, "b": 120, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "o"}, {"d": 0.125, "u": 1.5, "c": "o"}, {"d": 0.15, "u": 1.5, "c": "o"}, {"d": 0.2, "u": 2.0, "c": "o"}, {"d": 0.25, "u": 2.5, "c": "o"}, {"d": 0.3, "u": 3.0, "c": "y"}, {"d": 0.4, "u": 4.0, "c": "y"}, {"d": 0.5, "u": 5.0, "c": "g"}, {"d": 0.6, "u": 6.0, "c": "g"}, {"d": 0.75, "u": 7.5, "c": "g"}, {"d": 0.9, "u": 9.0, "c": "g"}, {"d": 1, "u": 10.0, "c": "g"}, {"d": 1.25, "u": 12.5, "c": "g"}, {"d": 1.5, "u": 15.0, "c": "g"}, {"d": 1.75, "u": 17.5, "c": "g"}, {"d": 2, "u": 20.0, "c": "g"}, {"d": 2.5, "u": 25.0, "c": "g"}, {"d": 3, "u": 30.0, "c": "g"}, {"d": 4, "u": 40.0, "c": "y"}, {"d": 5, "u": 50.0, "c": "y"}, {"d": 6, "u": 60.0, "c": "o"}, {"d": 7.5, "u": 75.0, "c": "o"}, {"d": 8, "u": 80.0, "c": "o"}, {"d": 9, "u": 90.0, "c": "o"}, {"d": 10, "u": 100.0, "c": "r"}, {"d": 11, "u": 110.0, "c": "r"}, {"d": 12, "u": 120.0, "c": "r"}]}, {"v": 12, "b": 150, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.5, "c": "o"}, {"d": 0.125, "u": 1.5, "c": "o"}, {"d": 0.15, "u": 2.0, "c": "o"}, {"d": 0.2, "u": 2.5, "c": "o"}, {"d": 0.25, "u": 3.0, "c": "y"}, {"d": 0.3, "u": 4.0, "c": "y"}, {"d": 0.4, "u": 5.0, "c": "g"}, {"d": 0.5, "u": 6.5, "c": "g"}, {"d": 0.6, "u": 7.5, "c": "g"}, {"d": 0.75, "u": 9.5, "c": "g"}, {"d": 0.9, "u": 11.5, "c": "g"}, {"d": 1, "u": 12.5, "c": "g"}, {"d": 1.25, "u": 15.5, "c": "g"}, {"d": 1.5, "u": 19.0, "c": "g"}, {"d": 1.75, "u": 22.0, "c": "g"}, {"d": 2, "u": 25.0, "c": "g"}, {"d": 2.5, "u": 31.5, "c": "y"}, {"d": 3, "u": 37.5, "c": "y"}, {"d": 4, "u": 50.0, "c": "y"}, {"d": 5, "u": 62.5, "c": "o"}, {"d": 6, "u": 75.0, "c": "o"}, {"d": 7.5, "u": 94.0, "c": "o"}, {"d": 8, "u": 100.0, "c": "o"}, {"d": 9, "u": 112.5, "c": "r"}, {"d": 10, "u": 125.0, "c": "r"}, {"d": 11, "u": 137.5, "c": "r"}, {"d": 12, "u": 150.0, "c": "r"}]}, {"v": 12, "b": 200, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 1.5, "c": "o"}, {"d": 0.125, "u": 2.0, "c": "o"}, {"d": 0.15, "u": 2.5, "c": "o"}, {"d": 0.2, "u": 3.5, "c": "y"}, {"d": 0.25, "u": 4.0, "c": "y"}, {"d": 0.3, "u": 5.0, "c": "g"}, {"d": 0.4, "u": 6.5, "c": "g"}, {"d": 0.5, "u": 8.5, "c": "g"}, {"d": 0.6, "u": 10.0, "c": "g"}, {"d": 0.75, "u": 12.5, "c": "g"}, {"d": 0.9, "u": 15.0, "c": "g"}, {"d": 1, "u": 16.5, "c": "g"}, {"d": 1.25, "u": 21.0, "c": "g"}, {"d": 1.5, "u": 25.0, "c": "g"}, {"d": 1.75, "u": 29.0, "c": "g"}, {"d": 2, "u": 33.5, "c": "y"}, {"d": 2.5, "u": 41.5, "c": "y"}, {"d": 3, "u": 50.0, "c": "y"}, {"d": 4, "u": 66.5, "c": "o"}, {"d": 5, "u": 83.5, "c": "o"}, {"d": 6, "u": 100.0, "c": "o"}, {"d": 7.5, "u": 125.0, "c": "r"}, {"d": 8, "u": 133.5, "c": "r"}, {"d": 9, "u": 150.0, "c": "r"}, {"d": 10, "u": 166.5, "c": "r"}, {"d": 11, "u": 183.5, "c": "r"}, {"d": 12, "u": 200.0, "c": "r"}]}, {"v": 12, "b": 240, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 2.0, "c": "o"}, {"d": 0.125, "u": 2.5, "c": "o"}, {"d": 0.15, "u": 3.0, "c": "y"}, {"d": 0.2, "u": 4.0, "c": "y"}, {"d": 0.25, "u": 5.0, "c": "g"}, {"d": 0.3, "u": 6.0, "c": "g"}, {"d": 0.4, "u": 8.0, "c": "g"}, {"d": 0.5, "u": 10.0, "c": "g"}, {"d": 0.6, "u": 12.0, "c": "g"}, {"d": 0.75, "u": 15.0, "c": "g"}, {"d": 0.9, "u": 18.0, "c": "g"}, {"d": 1, "u": 20.0, "c": "g"}, {"d": 1.25, "u": 25.0, "c": "g"}, {"d": 1.5, "u": 30.0, "c": "g"}, {"d": 1.75, "u": 35.0, "c": "y"}, {"d": 2, "u": 40.0, "c": "y"}, {"d": 2.5, "u": 50.0, "c": "y"}, {"d": 3, "u": 60.0, "c": "o"}, {"d": 4, "u": 80.0, "c": "o"}, {"d": 5, "u": 100.0, "c": "r"}, {"d": 6, "u": 120.0, "c": "r"}, {"d": 7.5, "u": 150.0, "c": "r"}, {"d": 8, "u": 160.0, "c": "r"}, {"d": 9, "u": 180.0, "c": "r"}, {"d": 10, "u": 200.0, "c": "r"}, {"d": 11, "u": 220.0, "c": "r"}, {"d": 12, "u": 240.0, "c": "r"}]}, {"v": 12, "b": 300, "cells": [{"d": 0.05, "u": 1.5, "c": "o"}, {"d": 0.1, "u": 2.5, "c": "o"}, {"d": 0.125, "u": 3.0, "c": "y"}, {"d": 0.15, "u": 4.0, "c": "y"}, {"d": 0.2, "u": 5.0, "c": "g"}, {"d": 0.25, "u": 6.5, "c": "g"}, {"d": 0.3, "u": 7.5, "c": "g"}, {"d": 0.4, "u": 10.0, "c": "g"}, {"d": 0.5, "u": 12.5, "c": "g"}, {"d": 0.6, "u": 15.0, "c": "g"}, {"d": 0.75, "u": 19.0, "c": "g"}, {"d": 0.9, "u": 22.5, "c": "g"}, {"d": 1, "u": 25.0, "c": "g"}, {"d": 1.25, "u": 31.5, "c": "y"}, {"d": 1.5, "u": 37.5, "c": "y"}, {"d": 1.75, "u": 44.0, "c": "y"}, {"d": 2, "u": 50.0, "c": "y"}, {"d": 2.5, "u": 62.5, "c": "o"}, {"d": 3, "u": 75.0, "c": "o"}, {"d": 4, "u": 100.0, "c": "o"}, {"d": 5, "u": 125.0, "c": "r"}, {"d": 6, "u": 150.0, "c": "r"}, {"d": 7.5, "u": 187.5, "c": "r"}, {"d": 8, "u": 200.0, "c": "r"}, {"d": 9, "u": 225.0, "c": "r"}, {"d": 10, "u": 250.0, "c": "r"}, {"d": 11, "u": 275.0, "c": "r"}, {"d": 12, "u": 300.0, "c": "r"}]}, {"v": 12, "b": 400, "cells": [{"d": 0.05, "u": 1.5, "c": "o"}, {"d": 0.1, "u": 3.5, "c": "y"}, {"d": 0.125, "u": 4.0, "c": "y"}, {"d": 0.15, "u": 5.0, "c": "g"}, {"d": 0.2, "u": 6.5, "c": "g"}, {"d": 0.25, "u": 8.5, "c": "g"}, {"d": 0.3, "u": 10.0, "c": "g"}, {"d": 0.4, "u": 13.5, "c": "g"}, {"d": 0.5, "u": 16.5, "c": "g"}, {"d": 0.6, "u": 20.0, "c": "g"}, {"d": 0.75, "u": 25.0, "c": "g"}, {"d": 0.9, "u": 30.0, "c": "g"}, {"d": 1, "u": 33.5, "c": "y"}, {"d": 1.25, "u": 41.5, "c": "y"}, {"d": 1.5, "u": 50.0, "c": "y"}, {"d": 1.75, "u": 58.5, "c": "o"}, {"d": 2, "u": 66.5, "c": "o"}, {"d": 2.5, "u": 83.5, "c": "o"}, {"d": 3, "u": 100.0, "c": "o"}, {"d": 4, "u": 133.5, "c": "r"}, {"d": 5, "u": 166.5, "c": "r"}, {"d": 6, "u": 200.0, "c": "r"}, {"d": 7.5, "u": 250.0, "c": "r"}, {"d": 8, "u": 266.5, "c": "r"}, {"d": 9, "u": 300.0, "c": "r"}, {"d": 10, "u": 333.5, "c": "r"}, {"d": 11, "u": 366.5, "c": "r"}, {"d": 12, "u": 400.0, "c": "r"}]}, {"v": 12, "b": 500, "cells": [{"d": 0.05, "u": 2.0, "c": "o"}, {"d": 0.1, "u": 4.0, "c": "y"}, {"d": 0.125, "u": 5.0, "c": "g"}, {"d": 0.15, "u": 6.5, "c": "g"}, {"d": 0.2, "u": 8.5, "c": "g"}, {"d": 0.25, "u": 10.5, "c": "g"}, {"d": 0.3, "u": 12.5, "c": "g"}, {"d": 0.4, "u": 16.5, "c": "g"}, {"d": 0.5, "u": 21.0, "c": "g"}, {"d": 0.6, "u": 25.0, "c": "g"}, {"d": 0.75, "u": 31.5, "c": "y"}, {"d": 0.9, "u": 37.5, "c": "y"}, {"d": 1, "u": 41.5, "c": "y"}, {"d": 1.25, "u": 52.0, "c": "o"}, {"d": 1.5, "u": 62.5, "c": "o"}, {"d": 1.75, "u": 73.0, "c": "o"}, {"d": 2, "u": 83.5, "c": "o"}, {"d": 2.5, "u": 104.0, "c": "r"}, {"d": 3, "u": 125.0, "c": "r"}, {"d": 4, "u": 166.5, "c": "r"}, {"d": 5, "u": 208.5, "c": "r"}, {"d": 6, "u": 250.0, "c": "r"}, {"d": 7.5, "u": 312.5, "c": "r"}, {"d": 8, "u": 333.5, "c": "r"}, {"d": 9, "u": 375.0, "c": "r"}, {"d": 10, "u": 416.5, "c": "r"}, {"d": 11, "u": 458.5, "c": "r"}, {"d": 12, "u": 500.0, "c": "r"}]}, {"v": 15, "b": 50, "cells": [{"d": 0.05, "u": 0.0, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 0.5, "c": "r"}, {"d": 0.15, "u": 0.5, "c": "r"}, {"d": 0.2, "u": 0.5, "c": "r"}, {"d": 0.25, "u": 1.0, "c": "o"}, {"d": 0.3, "u": 1.0, "c": "o"}, {"d": 0.4, "u": 1.5, "c": "o"}, {"d": 0.5, "u": 1.5, "c": "o"}, {"d": 0.6, "u": 2.0, "c": "o"}, {"d": 0.75, "u": 2.5, "c": "o"}, {"d": 0.9, "u": 3.0, "c": "y"}, {"d": 1, "u": 3.5, "c": "y"}, {"d": 1.25, "u": 4.0, "c": "y"}, {"d": 1.5, "u": 5.0, "c": "g"}, {"d": 1.75, "u": 6.0, "c": "g"}, {"d": 2, "u": 6.5, "c": "g"}, {"d": 2.5, "u": 8.5, "c": "g"}, {"d": 3, "u": 10.0, "c": "g"}, {"d": 4, "u": 13.5, "c": "g"}, {"d": 5, "u": 16.5, "c": "g"}, {"d": 6, "u": 20.0, "c": "g"}, {"d": 7.5, "u": 25.0, "c": "g"}, {"d": 8, "u": 26.5, "c": "g"}, {"d": 9, "u": 30.0, "c": "g"}, {"d": 10, "u": 33.5, "c": "y"}, {"d": 11, "u": 36.5, "c": "y"}, {"d": 12, "u": 40.0, "c": "y"}, {"d": 12.5, "u": 41.5, "c": "y"}, {"d": 13, "u": 43.5, "c": "y"}, {"d": 14, "u": 46.5, "c": "y"}, {"d": 15, "u": 50.0, "c": "y"}]}, {"v": 15, "b": 100, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 1.0, "c": "o"}, {"d": 0.15, "u": 1.0, "c": "o"}, {"d": 0.2, "u": 1.5, "c": "o"}, {"d": 0.25, "u": 1.5, "c": "o"}, {"d": 0.3, "u": 2.0, "c": "o"}, {"d": 0.4, "u": 2.5, "c": "o"}, {"d": 0.5, "u": 3.5, "c": "y"}, {"d": 0.6, "u": 4.0, "c": "y"}, {"d": 0.75, "u": 5.0, "c": "g"}, {"d": 0.9, "u": 6.0, "c": "g"}, {"d": 1, "u": 6.5, "c": "g"}, {"d": 1.25, "u": 8.5, "c": "g"}, {"d": 1.5, "u": 10.0, "c": "g"}, {"d": 1.75, "u": 11.5, "c": "g"}, {"d": 2, "u": 13.5, "c": "g"}, {"d": 2.5, "u": 16.5, "c": "g"}, {"d": 3, "u": 20.0, "c": "g"}, {"d": 4, "u": 26.5, "c": "g"}, {"d": 5, "u": 33.5, "c": "y"}, {"d": 6, "u": 40.0, "c": "y"}, {"d": 7.5, "u": 50.0, "c": "y"}, {"d": 8, "u": 53.5, "c": "o"}, {"d": 9, "u": 60.0, "c": "o"}, {"d": 10, "u": 66.5, "c": "o"}, {"d": 11, "u": 73.5, "c": "o"}, {"d": 12, "u": 80.0, "c": "o"}, {"d": 12.5, "u": 83.5, "c": "o"}, {"d": 13, "u": 86.5, "c": "o"}, {"d": 14, "u": 93.5, "c": "o"}, {"d": 15, "u": 100.0, "c": "o"}]}, {"v": 15, "b": 125, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "o"}, {"d": 0.125, "u": 1.0, "c": "o"}, {"d": 0.15, "u": 1.5, "c": "o"}, {"d": 0.2, "u": 1.5, "c": "o"}, {"d": 0.25, "u": 2.0, "c": "o"}, {"d": 0.3, "u": 2.5, "c": "o"}, {"d": 0.4, "u": 3.5, "c": "y"}, {"d": 0.5, "u": 4.0, "c": "y"}, {"d": 0.6, "u": 5.0, "c": "g"}, {"d": 0.75, "u": 6.5, "c": "g"}, {"d": 0.9, "u": 7.5, "c": "g"}, {"d": 1, "u": 8.5, "c": "g"}, {"d": 1.25, "u": 10.5, "c": "g"}, {"d": 1.5, "u": 12.5, "c": "g"}, {"d": 1.75, "u": 14.5, "c": "g"}, {"d": 2, "u": 16.5, "c": "g"}, {"d": 2.5, "u": 21.0, "c": "g"}, {"d": 3, "u": 25.0, "c": "g"}, {"d": 4, "u": 33.5, "c": "y"}, {"d": 5, "u": 41.5, "c": "y"}, {"d": 6, "u": 50.0, "c": "y"}, {"d": 7.5, "u": 62.5, "c": "o"}, {"d": 8, "u": 66.5, "c": "o"}, {"d": 9, "u": 75.0, "c": "o"}, {"d": 10, "u": 83.5, "c": "o"}, {"d": 11, "u": 91.5, "c": "o"}, {"d": 12, "u": 100.0, "c": "o"}, {"d": 12.5, "u": 104.0, "c": "r"}, {"d": 13, "u": 108.5, "c": "r"}, {"d": 14, "u": 116.5, "c": "r"}, {"d": 15, "u": 125.0, "c": "r"}]}, {"v": 15, "b": 150, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "o"}, {"d": 0.125, "u": 1.5, "c": "o"}, {"d": 0.15, "u": 1.5, "c": "o"}, {"d": 0.2, "u": 2.0, "c": "o"}, {"d": 0.25, "u": 2.5, "c": "o"}, {"d": 0.3, "u": 3.0, "c": "y"}, {"d": 0.4, "u": 4.0, "c": "y"}, {"d": 0.5, "u": 5.0, "c": "g"}, {"d": 0.6, "u": 6.0, "c": "g"}, {"d": 0.75, "u": 7.5, "c": "g"}, {"d": 0.9, "u": 9.0, "c": "g"}, {"d": 1, "u": 10.0, "c": "g"}, {"d": 1.25, "u": 12.5, "c": "g"}, {"d": 1.5, "u": 15.0, "c": "g"}, {"d": 1.75, "u": 17.5, "c": "g"}, {"d": 2, "u": 20.0, "c": "g"}, {"d": 2.5, "u": 25.0, "c": "g"}, {"d": 3, "u": 30.0, "c": "g"}, {"d": 4, "u": 40.0, "c": "y"}, {"d": 5, "u": 50.0, "c": "y"}, {"d": 6, "u": 60.0, "c": "o"}, {"d": 7.5, "u": 75.0, "c": "o"}, {"d": 8, "u": 80.0, "c": "o"}, {"d": 9, "u": 90.0, "c": "o"}, {"d": 10, "u": 100.0, "c": "o"}, {"d": 11, "u": 110.0, "c": "r"}, {"d": 12, "u": 120.0, "c": "r"}, {"d": 12.5, "u": 125.0, "c": "r"}, {"d": 13, "u": 130.0, "c": "r"}, {"d": 14, "u": 140.0, "c": "r"}, {"d": 15, "u": 150.0, "c": "r"}]}, {"v": 15, "b": 200, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.5, "c": "o"}, {"d": 0.125, "u": 1.5, "c": "o"}, {"d": 0.15, "u": 2.0, "c": "o"}, {"d": 0.2, "u": 2.5, "c": "o"}, {"d": 0.25, "u": 3.5, "c": "y"}, {"d": 0.3, "u": 4.0, "c": "y"}, {"d": 0.4, "u": 5.5, "c": "g"}, {"d": 0.5, "u": 6.5, "c": "g"}, {"d": 0.6, "u": 8.0, "c": "g"}, {"d": 0.75, "u": 10.0, "c": "g"}, {"d": 0.9, "u": 12.0, "c": "g"}, {"d": 1, "u": 13.5, "c": "g"}, {"d": 1.25, "u": 16.5, "c": "g"}, {"d": 1.5, "u": 20.0, "c": "g"}, {"d": 1.75, "u": 23.5, "c": "g"}, {"d": 2, "u": 26.5, "c": "g"}, {"d": 2.5, "u": 33.5, "c": "y"}, {"d": 3, "u": 40.0, "c": "y"}, {"d": 4, "u": 53.5, "c": "o"}, {"d": 5, "u": 66.5, "c": "o"}, {"d": 6, "u": 80.0, "c": "o"}, {"d": 7.5, "u": 100.0, "c": "o"}, {"d": 8, "u": 106.5, "c": "r"}, {"d": 9, "u": 120.0, "c": "r"}, {"d": 10, "u": 133.5, "c": "r"}, {"d": 11, "u": 146.5, "c": "r"}, {"d": 12, "u": 160.0, "c": "r"}, {"d": 12.5, "u": 166.5, "c": "r"}, {"d": 13, "u": 173.5, "c": "r"}, {"d": 14, "u": 186.5, "c": "r"}, {"d": 15, "u": 200.0, "c": "r"}]}, {"v": 15, "b": 250, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 1.5, "c": "o"}, {"d": 0.125, "u": 2.0, "c": "o"}, {"d": 0.15, "u": 2.5, "c": "o"}, {"d": 0.2, "u": 3.5, "c": "y"}, {"d": 0.25, "u": 4.0, "c": "y"}, {"d": 0.3, "u": 5.0, "c": "g"}, {"d": 0.4, "u": 6.5, "c": "g"}, {"d": 0.5, "u": 8.5, "c": "g"}, {"d": 0.6, "u": 10.0, "c": "g"}, {"d": 0.75, "u": 12.5, "c": "g"}, {"d": 0.9, "u": 15.0, "c": "g"}, {"d": 1, "u": 16.5, "c": "g"}, {"d": 1.25, "u": 21.0, "c": "g"}, {"d": 1.5, "u": 25.0, "c": "g"}, {"d": 1.75, "u": 29.0, "c": "g"}, {"d": 2, "u": 33.5, "c": "y"}, {"d": 2.5, "u": 41.5, "c": "y"}, {"d": 3, "u": 50.0, "c": "y"}, {"d": 4, "u": 66.5, "c": "o"}, {"d": 5, "u": 83.5, "c": "o"}, {"d": 6, "u": 100.0, "c": "o"}, {"d": 7.5, "u": 125.0, "c": "r"}, {"d": 8, "u": 133.5, "c": "r"}, {"d": 9, "u": 150.0, "c": "r"}, {"d": 10, "u": 166.5, "c": "r"}, {"d": 11, "u": 183.5, "c": "r"}, {"d": 12, "u": 200.0, "c": "r"}, {"d": 12.5, "u": 208.5, "c": "r"}, {"d": 13, "u": 216.5, "c": "r"}, {"d": 14, "u": 233.5, "c": "r"}, {"d": 15, "u": 250.0, "c": "r"}]}, {"v": 15, "b": 300, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 2.0, "c": "o"}, {"d": 0.125, "u": 2.5, "c": "o"}, {"d": 0.15, "u": 3.0, "c": "y"}, {"d": 0.2, "u": 4.0, "c": "y"}, {"d": 0.25, "u": 5.0, "c": "g"}, {"d": 0.3, "u": 6.0, "c": "g"}, {"d": 0.4, "u": 8.0, "c": "g"}, {"d": 0.5, "u": 10.0, "c": "g"}, {"d": 0.6, "u": 12.0, "c": "g"}, {"d": 0.75, "u": 15.0, "c": "g"}, {"d": 0.9, "u": 18.0, "c": "g"}, {"d": 1, "u": 20.0, "c": "g"}, {"d": 1.25, "u": 25.0, "c": "g"}, {"d": 1.5, "u": 30.0, "c": "g"}, {"d": 1.75, "u": 35.0, "c": "y"}, {"d": 2, "u": 40.0, "c": "y"}, {"d": 2.5, "u": 50.0, "c": "y"}, {"d": 3, "u": 60.0, "c": "o"}, {"d": 4, "u": 80.0, "c": "o"}, {"d": 5, "u": 100.0, "c": "o"}, {"d": 6, "u": 120.0, "c": "r"}, {"d": 7.5, "u": 150.0, "c": "r"}, {"d": 8, "u": 160.0, "c": "r"}, {"d": 9, "u": 180.0, "c": "r"}, {"d": 10, "u": 200.0, "c": "r"}, {"d": 11, "u": 220.0, "c": "r"}, {"d": 12, "u": 240.0, "c": "r"}, {"d": 12.5, "u": 250.0, "c": "r"}, {"d": 13, "u": 260.0, "c": "r"}, {"d": 14, "u": 280.0, "c": "r"}, {"d": 15, "u": 300.0, "c": "r"}]}, {"v": 15, "b": 400, "cells": [{"d": 0.05, "u": 1.5, "c": "o"}, {"d": 0.1, "u": 2.5, "c": "o"}, {"d": 0.125, "u": 3.5, "c": "y"}, {"d": 0.15, "u": 4.0, "c": "y"}, {"d": 0.2, "u": 5.5, "c": "g"}, {"d": 0.25, "u": 6.5, "c": "g"}, {"d": 0.3, "u": 8.0, "c": "g"}, {"d": 0.4, "u": 10.5, "c": "g"}, {"d": 0.5, "u": 13.5, "c": "g"}, {"d": 0.6, "u": 16.0, "c": "g"}, {"d": 0.75, "u": 20.0, "c": "g"}, {"d": 0.9, "u": 24.0, "c": "g"}, {"d": 1, "u": 26.5, "c": "g"}, {"d": 1.25, "u": 33.5, "c": "y"}, {"d": 1.5, "u": 40.0, "c": "y"}, {"d": 1.75, "u": 46.5, "c": "y"}, {"d": 2, "u": 53.5, "c": "o"}, {"d": 2.5, "u": 66.5, "c": "o"}, {"d": 3, "u": 80.0, "c": "o"}, {"d": 4, "u": 106.5, "c": "r"}, {"d": 5, "u": 133.5, "c": "r"}, {"d": 6, "u": 160.0, "c": "r"}, {"d": 7.5, "u": 200.0, "c": "r"}, {"d": 8, "u": 213.5, "c": "r"}, {"d": 9, "u": 240.0, "c": "r"}, {"d": 10, "u": 266.5, "c": "r"}, {"d": 11, "u": 293.5, "c": "r"}, {"d": 12, "u": 320.0, "c": "r"}, {"d": 12.5, "u": 333.5, "c": "r"}, {"d": 13, "u": 346.5, "c": "r"}, {"d": 14, "u": 373.5, "c": "r"}, {"d": 15, "u": 400.0, "c": "r"}]}, {"v": 15, "b": 500, "cells": [{"d": 0.05, "u": 1.5, "c": "o"}, {"d": 0.1, "u": 3.5, "c": "y"}, {"d": 0.125, "u": 4.0, "c": "y"}, {"d": 0.15, "u": 5.0, "c": "g"}, {"d": 0.2, "u": 6.5, "c": "g"}, {"d": 0.25, "u": 8.5, "c": "g"}, {"d": 0.3, "u": 10.0, "c": "g"}, {"d": 0.4, "u": 13.5, "c": "g"}, {"d": 0.5, "u": 16.5, "c": "g"}, {"d": 0.6, "u": 20.0, "c": "g"}, {"d": 0.75, "u": 25.0, "c": "g"}, {"d": 0.9, "u": 30.0, "c": "g"}, {"d": 1, "u": 33.5, "c": "y"}, {"d": 1.25, "u": 41.5, "c": "y"}, {"d": 1.5, "u": 50.0, "c": "y"}, {"d": 1.75, "u": 58.5, "c": "o"}, {"d": 2, "u": 66.5, "c": "o"}, {"d": 2.5, "u": 83.5, "c": "o"}, {"d": 3, "u": 100.0, "c": "o"}, {"d": 4, "u": 133.5, "c": "r"}, {"d": 5, "u": 166.5, "c": "r"}, {"d": 6, "u": 200.0, "c": "r"}, {"d": 7.5, "u": 250.0, "c": "r"}, {"d": 8, "u": 266.5, "c": "r"}, {"d": 9, "u": 300.0, "c": "r"}, {"d": 10, "u": 333.5, "c": "r"}, {"d": 11, "u": 366.5, "c": "r"}, {"d": 12, "u": 400.0, "c": "r"}, {"d": 12.5, "u": 416.5, "c": "r"}, {"d": 13, "u": 433.5, "c": "r"}, {"d": 14, "u": 466.5, "c": "r"}, {"d": 15, "u": 500.0, "c": "r"}]}, {"v": 17.5, "b": 70, "cells": [{"d": 0.05, "u": 0.0, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 0.5, "c": "r"}, {"d": 0.15, "u": 0.5, "c": "r"}, {"d": 0.2, "u": 1.0, "c": "o"}, {"d": 0.25, "u": 1.0, "c": "o"}, {"d": 0.3, "u": 1.0, "c": "o"}, {"d": 0.4, "u": 1.5, "c": "o"}, {"d": 0.5, "u": 2.0, "c": "o"}, {"d": 0.6, "u": 2.5, "c": "o"}, {"d": 0.75, "u": 3.0, "c": "y"}, {"d": 0.9, "u": 3.5, "c": "y"}, {"d": 1, "u": 4.0, "c": "y"}, {"d": 1.25, "u": 5.0, "c": "g"}, {"d": 1.5, "u": 6.0, "c": "g"}, {"d": 1.75, "u": 7.0, "c": "g"}, {"d": 2, "u": 8.0, "c": "g"}, {"d": 2.5, "u": 10.0, "c": "g"}, {"d": 3, "u": 12.0, "c": "g"}, {"d": 4, "u": 16.0, "c": "g"}, {"d": 5, "u": 20.0, "c": "g"}, {"d": 6, "u": 24.0, "c": "g"}, {"d": 7.5, "u": 30.0, "c": "g"}, {"d": 8, "u": 32.0, "c": "y"}, {"d": 9, "u": 36.0, "c": "y"}, {"d": 10, "u": 40.0, "c": "y"}, {"d": 11, "u": 44.0, "c": "y"}, {"d": 12, "u": 48.0, "c": "y"}, {"d": 12.5, "u": 50.0, "c": "y"}, {"d": 13, "u": 52.0, "c": "o"}, {"d": 14, "u": 56.0, "c": "o"}, {"d": 15, "u": 60.0, "c": "o"}]}, {"v": 17.5, "b": 100, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 0.5, "c": "r"}, {"d": 0.15, "u": 1.0, "c": "o"}, {"d": 0.2, "u": 1.0, "c": "o"}, {"d": 0.25, "u": 1.5, "c": "o"}, {"d": 0.3, "u": 1.5, "c": "o"}, {"d": 0.4, "u": 2.5, "c": "o"}, {"d": 0.5, "u": 3.0, "c": "y"}, {"d": 0.6, "u": 3.5, "c": "y"}, {"d": 0.75, "u": 4.5, "c": "y"}, {"d": 0.9, "u": 5.0, "c": "g"}, {"d": 1, "u": 5.5, "c": "g"}, {"d": 1.25, "u": 7.0, "c": "g"}, {"d": 1.5, "u": 8.5, "c": "g"}, {"d": 1.75, "u": 10.0, "c": "g"}, {"d": 2, "u": 11.5, "c": "g"}, {"d": 2.5, "u": 14.5, "c": "g"}, {"d": 3, "u": 17.0, "c": "g"}, {"d": 4, "u": 23.0, "c": "g"}, {"d": 5, "u": 28.5, "c": "g"}, {"d": 6, "u": 34.5, "c": "y"}, {"d": 7.5, "u": 43.0, "c": "y"}, {"d": 8, "u": 45.5, "c": "y"}, {"d": 9, "u": 51.5, "c": "o"}, {"d": 10, "u": 57.0, "c": "o"}, {"d": 11, "u": 63.0, "c": "o"}, {"d": 12, "u": 68.5, "c": "o"}, {"d": 12.5, "u": 71.5, "c": "o"}, {"d": 13, "u": 74.5, "c": "o"}, {"d": 14, "u": 80.0, "c": "o"}, {"d": 15, "u": 85.5, "c": "o"}]}, {"v": 17.5, "b": 125, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 1.0, "c": "o"}, {"d": 0.15, "u": 1.0, "c": "o"}, {"d": 0.2, "u": 1.5, "c": "o"}, {"d": 0.25, "u": 2.0, "c": "o"}, {"d": 0.3, "u": 2.0, "c": "o"}, {"d": 0.4, "u": 3.0, "c": "y"}, {"d": 0.5, "u": 3.5, "c": "y"}, {"d": 0.6, "u": 4.5, "c": "y"}, {"d": 0.75, "u": 5.5, "c": "g"}, {"d": 0.9, "u": 6.5, "c": "g"}, {"d": 1, "u": 7.0, "c": "g"}, {"d": 1.25, "u": 9.0, "c": "g"}, {"d": 1.5, "u": 10.5, "c": "g"}, {"d": 1.75, "u": 12.5, "c": "g"}, {"d": 2, "u": 14.5, "c": "g"}, {"d": 2.5, "u": 18.0, "c": "g"}, {"d": 3, "u": 21.5, "c": "g"}, {"d": 4, "u": 28.5, "c": "g"}, {"d": 5, "u": 35.5, "c": "y"}, {"d": 6, "u": 43.0, "c": "y"}, {"d": 7.5, "u": 53.5, "c": "o"}, {"d": 8, "u": 57.0, "c": "o"}, {"d": 9, "u": 64.5, "c": "o"}, {"d": 10, "u": 71.5, "c": "o"}, {"d": 11, "u": 78.5, "c": "o"}, {"d": 12, "u": 85.5, "c": "o"}, {"d": 12.5, "u": 89.5, "c": "o"}, {"d": 13, "u": 93.0, "c": "o"}, {"d": 14, "u": 100.0, "c": "o"}, {"d": 15, "u": 107.0, "c": "r"}]}, {"v": 17.5, "b": 140, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "o"}, {"d": 0.125, "u": 1.0, "c": "o"}, {"d": 0.15, "u": 1.0, "c": "o"}, {"d": 0.2, "u": 1.5, "c": "o"}, {"d": 0.25, "u": 2.0, "c": "o"}, {"d": 0.3, "u": 2.5, "c": "o"}, {"d": 0.4, "u": 3.0, "c": "y"}, {"d": 0.5, "u": 4.0, "c": "y"}, {"d": 0.6, "u": 5.0, "c": "g"}, {"d": 0.75, "u": 6.0, "c": "g"}, {"d": 0.9, "u": 7.0, "c": "g"}, {"d": 1, "u": 8.0, "c": "g"}, {"d": 1.25, "u": 10.0, "c": "g"}, {"d": 1.5, "u": 12.0, "c": "g"}, {"d": 1.75, "u": 14.0, "c": "g"}, {"d": 2, "u": 16.0, "c": "g"}, {"d": 2.5, "u": 20.0, "c": "g"}, {"d": 3, "u": 24.0, "c": "g"}, {"d": 4, "u": 32.0, "c": "y"}, {"d": 5, "u": 40.0, "c": "y"}, {"d": 6, "u": 48.0, "c": "y"}, {"d": 7.5, "u": 60.0, "c": "o"}, {"d": 8, "u": 64.0, "c": "o"}, {"d": 9, "u": 72.0, "c": "o"}, {"d": 10, "u": 80.0, "c": "o"}, {"d": 11, "u": 88.0, "c": "o"}, {"d": 12, "u": 96.0, "c": "o"}, {"d": 12.5, "u": 100.0, "c": "o"}, {"d": 13, "u": 104.0, "c": "r"}, {"d": 14, "u": 112.0, "c": "r"}, {"d": 15, "u": 120.0, "c": "r"}]}, {"v": 17.5, "b": 200, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "o"}, {"d": 0.125, "u": 1.5, "c": "o"}, {"d": 0.15, "u": 1.5, "c": "o"}, {"d": 0.2, "u": 2.5, "c": "o"}, {"d": 0.25, "u": 3.0, "c": "y"}, {"d": 0.3, "u": 3.5, "c": "y"}, {"d": 0.4, "u": 4.5, "c": "y"}, {"d": 0.5, "u": 5.5, "c": "g"}, {"d": 0.6, "u": 7.0, "c": "g"}, {"d": 0.75, "u": 8.5, "c": "g"}, {"d": 0.9, "u": 10.5, "c": "g"}, {"d": 1, "u": 11.5, "c": "g"}, {"d": 1.25, "u": 14.5, "c": "g"}, {"d": 1.5, "u": 17.0, "c": "g"}, {"d": 1.75, "u": 20.0, "c": "g"}, {"d": 2, "u": 23.0, "c": "g"}, {"d": 2.5, "u": 28.5, "c": "g"}, {"d": 3, "u": 34.5, "c": "y"}, {"d": 4, "u": 45.5, "c": "y"}, {"d": 5, "u": 57.0, "c": "o"}, {"d": 6, "u": 68.5, "c": "o"}, {"d": 7.5, "u": 85.5, "c": "o"}, {"d": 8, "u": 91.5, "c": "o"}, {"d": 9, "u": 103.0, "c": "r"}, {"d": 10, "u": 114.5, "c": "r"}, {"d": 11, "u": 125.5, "c": "r"}, {"d": 12, "u": 137.0, "c": "r"}, {"d": 12.5, "u": 143.0, "c": "r"}, {"d": 13, "u": 148.5, "c": "r"}, {"d": 14, "u": 160.0, "c": "r"}, {"d": 15, "u": 171.5, "c": "r"}]}, {"v": 17.5, "b": 280, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 1.5, "c": "o"}, {"d": 0.125, "u": 2.0, "c": "o"}, {"d": 0.15, "u": 2.5, "c": "o"}, {"d": 0.2, "u": 3.0, "c": "y"}, {"d": 0.25, "u": 4.0, "c": "y"}, {"d": 0.3, "u": 5.0, "c": "g"}, {"d": 0.4, "u": 6.5, "c": "g"}, {"d": 0.5, "u": 8.0, "c": "g"}, {"d": 0.6, "u": 9.5, "c": "g"}, {"d": 0.75, "u": 12.0, "c": "g"}, {"d": 0.9, "u": 14.5, "c": "g"}, {"d": 1, "u": 16.0, "c": "g"}, {"d": 1.25, "u": 20.0, "c": "g"}, {"d": 1.5, "u": 24.0, "c": "g"}, {"d": 1.75, "u": 28.0, "c": "g"}, {"d": 2, "u": 32.0, "c": "y"}, {"d": 2.5, "u": 40.0, "c": "y"}, {"d": 3, "u": 48.0, "c": "y"}, {"d": 4, "u": 64.0, "c": "o"}, {"d": 5, "u": 80.0, "c": "o"}, {"d": 6, "u": 96.0, "c": "o"}, {"d": 7.5, "u": 120.0, "c": "r"}, {"d": 8, "u": 128.0, "c": "r"}, {"d": 9, "u": 144.0, "c": "r"}, {"d": 10, "u": 160.0, "c": "r"}, {"d": 11, "u": 176.0, "c": "r"}, {"d": 12, "u": 192.0, "c": "r"}, {"d": 12.5, "u": 200.0, "c": "r"}, {"d": 13, "u": 208.0, "c": "r"}, {"d": 14, "u": 224.0, "c": "r"}, {"d": 15, "u": 240.0, "c": "r"}]}, {"v": 17.5, "b": 300, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 1.5, "c": "o"}, {"d": 0.125, "u": 2.0, "c": "o"}, {"d": 0.15, "u": 2.5, "c": "o"}, {"d": 0.2, "u": 3.5, "c": "y"}, {"d": 0.25, "u": 4.5, "c": "y"}, {"d": 0.3, "u": 5.0, "c": "g"}, {"d": 0.4, "u": 7.0, "c": "g"}, {"d": 0.5, "u": 8.5, "c": "g"}, {"d": 0.6, "u": 10.5, "c": "g"}, {"d": 0.75, "u": 13.0, "c": "g"}, {"d": 0.9, "u": 15.5, "c": "g"}, {"d": 1, "u": 17.0, "c": "g"}, {"d": 1.25, "u": 21.5, "c": "g"}, {"d": 1.5, "u": 25.5, "c": "g"}, {"d": 1.75, "u": 30.0, "c": "g"}, {"d": 2, "u": 34.5, "c": "y"}, {"d": 2.5, "u": 43.0, "c": "y"}, {"d": 3, "u": 51.5, "c": "o"}, {"d": 4, "u": 68.5, "c": "o"}, {"d": 5, "u": 85.5, "c": "o"}, {"d": 6, "u": 103.0, "c": "r"}, {"d": 7.5, "u": 128.5, "c": "r"}, {"d": 8, "u": 137.0, "c": "r"}, {"d": 9, "u": 154.5, "c": "r"}, {"d": 10, "u": 171.5, "c": "r"}, {"d": 11, "u": 188.5, "c": "r"}, {"d": 12, "u": 205.5, "c": "r"}, {"d": 12.5, "u": 214.5, "c": "r"}, {"d": 13, "u": 223.0, "c": "r"}, {"d": 14, "u": 240.0, "c": "r"}, {"d": 15, "u": 257.0, "c": "r"}]}, {"v": 17.5, "b": 400, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 2.5, "c": "o"}, {"d": 0.125, "u": 3.0, "c": "y"}, {"d": 0.15, "u": 3.5, "c": "y"}, {"d": 0.2, "u": 4.5, "c": "y"}, {"d": 0.25, "u": 5.5, "c": "g"}, {"d": 0.3, "u": 7.0, "c": "g"}, {"d": 0.4, "u": 9.0, "c": "g"}, {"d": 0.5, "u": 11.5, "c": "g"}, {"d": 0.6, "u": 13.5, "c": "g"}, {"d": 0.75, "u": 17.0, "c": "g"}, {"d": 0.9, "u": 20.5, "c": "g"}, {"d": 1, "u": 23.0, "c": "g"}, {"d": 1.25, "u": 28.5, "c": "g"}, {"d": 1.5, "u": 34.5, "c": "y"}, {"d": 1.75, "u": 40.0, "c": "y"}, {"d": 2, "u": 45.5, "c": "y"}, {"d": 2.5, "u": 57.0, "c": "o"}, {"d": 3, "u": 68.5, "c": "o"}, {"d": 4, "u": 91.5, "c": "o"}, {"d": 5, "u": 114.5, "c": "r"}, {"d": 6, "u": 137.0, "c": "r"}, {"d": 7.5, "u": 171.5, "c": "r"}, {"d": 8, "u": 183.0, "c": "r"}, {"d": 9, "u": 205.5, "c": "r"}, {"d": 10, "u": 228.5, "c": "r"}, {"d": 11, "u": 251.5, "c": "r"}, {"d": 12, "u": 274.5, "c": "r"}, {"d": 12.5, "u": 285.5, "c": "r"}, {"d": 13, "u": 297.0, "c": "r"}, {"d": 14, "u": 320.0, "c": "r"}, {"d": 15, "u": 343.0, "c": "r"}]}, {"v": 17.5, "b": 500, "cells": [{"d": 0.05, "u": 1.5, "c": "o"}, {"d": 0.1, "u": 3.0, "c": "y"}, {"d": 0.125, "u": 3.5, "c": "y"}, {"d": 0.15, "u": 4.5, "c": "y"}, {"d": 0.2, "u": 5.5, "c": "g"}, {"d": 0.25, "u": 7.0, "c": "g"}, {"d": 0.3, "u": 8.5, "c": "g"}, {"d": 0.4, "u": 11.5, "c": "g"}, {"d": 0.5, "u": 14.5, "c": "g"}, {"d": 0.6, "u": 17.0, "c": "g"}, {"d": 0.75, "u": 21.5, "c": "g"}, {"d": 0.9, "u": 25.5, "c": "g"}, {"d": 1, "u": 28.5, "c": "g"}, {"d": 1.25, "u": 35.5, "c": "y"}, {"d": 1.5, "u": 43.0, "c": "y"}, {"d": 1.75, "u": 50.0, "c": "y"}, {"d": 2, "u": 57.0, "c": "o"}, {"d": 2.5, "u": 71.5, "c": "o"}, {"d": 3, "u": 85.5, "c": "o"}, {"d": 4, "u": 114.5, "c": "r"}, {"d": 5, "u": 143.0, "c": "r"}, {"d": 6, "u": 171.5, "c": "r"}, {"d": 7.5, "u": 214.5, "c": "r"}, {"d": 8, "u": 228.5, "c": "r"}, {"d": 9, "u": 257.0, "c": "r"}, {"d": 10, "u": 285.5, "c": "r"}, {"d": 11, "u": 314.5, "c": "r"}, {"d": 12, "u": 343.0, "c": "r"}, {"d": 12.5, "u": 357.0, "c": "r"}, {"d": 13, "u": 371.5, "c": "r"}, {"d": 14, "u": 400.0, "c": "r"}, {"d": 15, "u": 428.5, "c": "r"}]}, {"v": 20, "b": 100, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 0.5, "c": "r"}, {"d": 0.15, "u": 1.0, "c": "o"}, {"d": 0.2, "u": 1.0, "c": "o"}, {"d": 0.25, "u": 1.5, "c": "o"}, {"d": 0.3, "u": 1.5, "c": "o"}, {"d": 0.4, "u": 2.0, "c": "o"}, {"d": 0.5, "u": 2.5, "c": "o"}, {"d": 0.6, "u": 3.0, "c": "y"}, {"d": 0.75, "u": 4.0, "c": "y"}, {"d": 0.9, "u": 4.5, "c": "y"}, {"d": 1, "u": 5.0, "c": "g"}, {"d": 1.25, "u": 6.5, "c": "g"}, {"d": 1.5, "u": 7.5, "c": "g"}, {"d": 1.75, "u": 9.0, "c": "g"}, {"d": 2, "u": 10.0, "c": "g"}, {"d": 2.5, "u": 12.5, "c": "g"}, {"d": 3, "u": 15.0, "c": "g"}, {"d": 4, "u": 20.0, "c": "g"}, {"d": 5, "u": 25.0, "c": "g"}, {"d": 6, "u": 30.0, "c": "g"}, {"d": 7.5, "u": 37.5, "c": "y"}, {"d": 8, "u": 40.0, "c": "y"}, {"d": 9, "u": 45.0, "c": "y"}, {"d": 10, "u": 50.0, "c": "y"}, {"d": 11, "u": 55.0, "c": "o"}, {"d": 12, "u": 60.0, "c": "o"}, {"d": 12.5, "u": 62.5, "c": "o"}, {"d": 13, "u": 65.0, "c": "o"}, {"d": 14, "u": 70.0, "c": "o"}, {"d": 15, "u": 75.0, "c": "o"}]}, {"v": 20, "b": 125, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 1.0, "c": "o"}, {"d": 0.15, "u": 1.0, "c": "o"}, {"d": 0.2, "u": 2.0, "c": "o"}, {"d": 0.25, "u": 1.5, "c": "o"}, {"d": 0.3, "u": 2.0, "c": "o"}, {"d": 0.4, "u": 3.0, "c": "y"}, {"d": 0.5, "u": 3.0, "c": "y"}, {"d": 0.6, "u": 4.0, "c": "y"}, {"d": 0.75, "u": 4.5, "c": "y"}, {"d": 0.9, "u": 5.5, "c": "g"}, {"d": 1, "u": 7.0, "c": "g"}, {"d": 1.25, "u": 8.0, "c": "g"}, {"d": 1.5, "u": 9.5, "c": "g"}, {"d": 1.75, "u": 11.0, "c": "g"}, {"d": 2, "u": 13.0, "c": "g"}, {"d": 2.5, "u": 15.5, "c": "g"}, {"d": 3, "u": 19.0, "c": "g"}, {"d": 4, "u": 25.0, "c": "g"}, {"d": 5, "u": 32.0, "c": "y"}, {"d": 6, "u": 38.0, "c": "y"}, {"d": 7.5, "u": 47.0, "c": "y"}, {"d": 8, "u": 50.0, "c": "y"}, {"d": 9, "u": 57.0, "c": "o"}, {"d": 10, "u": 63.0, "c": "o"}, {"d": 11, "u": 69.0, "c": "o"}, {"d": 12, "u": 75.0, "c": "o"}, {"d": 12.5, "u": 78.0, "c": "o"}, {"d": 13, "u": 82.0, "c": "o"}, {"d": 14, "u": 88.0, "c": "o"}, {"d": 15, "u": 94.0, "c": "o"}]}, {"v": 20, "b": 150, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "o"}, {"d": 0.125, "u": 1.0, "c": "o"}, {"d": 0.15, "u": 1.0, "c": "o"}, {"d": 0.2, "u": 1.5, "c": "o"}, {"d": 0.25, "u": 2.0, "c": "o"}, {"d": 0.3, "u": 2.5, "c": "o"}, {"d": 0.4, "u": 3.0, "c": "y"}, {"d": 0.5, "u": 4.0, "c": "y"}, {"d": 0.6, "u": 4.5, "c": "y"}, {"d": 0.75, "u": 5.5, "c": "g"}, {"d": 0.9, "u": 7.0, "c": "g"}, {"d": 1, "u": 7.5, "c": "g"}, {"d": 1.25, "u": 9.5, "c": "g"}, {"d": 1.5, "u": 11.5, "c": "g"}, {"d": 1.75, "u": 13.0, "c": "g"}, {"d": 2, "u": 15.0, "c": "g"}, {"d": 2.5, "u": 19.0, "c": "g"}, {"d": 3, "u": 22.5, "c": "g"}, {"d": 4, "u": 30.0, "c": "g"}, {"d": 5, "u": 37.5, "c": "y"}, {"d": 6, "u": 45.0, "c": "y"}, {"d": 7.5, "u": 56.5, "c": "o"}, {"d": 8, "u": 60.0, "c": "o"}, {"d": 9, "u": 67.5, "c": "o"}, {"d": 10, "u": 75.0, "c": "o"}, {"d": 11, "u": 82.5, "c": "o"}, {"d": 12, "u": 90.0, "c": "o"}, {"d": 12.5, "u": 94.0, "c": "o"}, {"d": 13, "u": 97.5, "c": "o"}, {"d": 14, "u": 105.0, "c": "r"}, {"d": 15, "u": 112.5, "c": "r"}]}, {"v": 20, "b": 200, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "o"}, {"d": 0.125, "u": 1.5, "c": "o"}, {"d": 0.15, "u": 1.5, "c": "o"}, {"d": 0.2, "u": 2.0, "c": "o"}, {"d": 0.25, "u": 2.5, "c": "o"}, {"d": 0.3, "u": 3.0, "c": "y"}, {"d": 0.4, "u": 4.0, "c": "y"}, {"d": 0.5, "u": 5.0, "c": "g"}, {"d": 0.6, "u": 6.0, "c": "g"}, {"d": 0.75, "u": 7.5, "c": "g"}, {"d": 0.9, "u": 9.0, "c": "g"}, {"d": 1, "u": 10.0, "c": "g"}, {"d": 1.25, "u": 12.5, "c": "g"}, {"d": 1.5, "u": 15.0, "c": "g"}, {"d": 1.75, "u": 17.5, "c": "g"}, {"d": 2, "u": 20.0, "c": "g"}, {"d": 2.5, "u": 25.0, "c": "g"}, {"d": 3, "u": 30.0, "c": "g"}, {"d": 4, "u": 40.0, "c": "y"}, {"d": 5, "u": 50.0, "c": "y"}, {"d": 6, "u": 60.0, "c": "o"}, {"d": 7.5, "u": 75.0, "c": "o"}, {"d": 8, "u": 80.0, "c": "o"}, {"d": 9, "u": 90.0, "c": "o"}, {"d": 10, "u": 100.0, "c": "o"}, {"d": 11, "u": 110.0, "c": "r"}, {"d": 12, "u": 120.0, "c": "r"}, {"d": 12.5, "u": 125.0, "c": "r"}, {"d": 13, "u": 130.0, "c": "r"}, {"d": 14, "u": 140.0, "c": "r"}, {"d": 15, "u": 150.0, "c": "r"}]}, {"v": 20, "b": 250, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 2.0, "c": "o"}, {"d": 0.125, "u": 1.5, "c": "o"}, {"d": 0.15, "u": 2.0, "c": "o"}, {"d": 0.2, "u": 3.0, "c": "y"}, {"d": 0.25, "u": 3.0, "c": "y"}, {"d": 0.3, "u": 4.0, "c": "y"}, {"d": 0.4, "u": 5.0, "c": "g"}, {"d": 0.5, "u": 7.0, "c": "g"}, {"d": 0.6, "u": 8.0, "c": "g"}, {"d": 0.75, "u": 9.5, "c": "g"}, {"d": 0.9, "u": 12.0, "c": "g"}, {"d": 1, "u": 13.0, "c": "g"}, {"d": 1.25, "u": 15.5, "c": "g"}, {"d": 1.5, "u": 19.0, "c": "g"}, {"d": 1.75, "u": 22.0, "c": "g"}, {"d": 2, "u": 25.0, "c": "g"}, {"d": 2.5, "u": 32.0, "c": "y"}, {"d": 3, "u": 38.0, "c": "y"}, {"d": 4, "u": 50.0, "c": "y"}, {"d": 5, "u": 63.0, "c": "o"}, {"d": 6, "u": 75.0, "c": "o"}, {"d": 7.5, "u": 94.0, "c": "o"}, {"d": 8, "u": 100.0, "c": "o"}, {"d": 9, "u": 113.0, "c": "r"}, {"d": 10, "u": 125.0, "c": "r"}, {"d": 11, "u": 138.0, "c": "r"}, {"d": 12, "u": 150.0, "c": "r"}, {"d": 12.5, "u": 156.5, "c": "r"}, {"d": 13, "u": 163.0, "c": "r"}, {"d": 14, "u": 175.0, "c": "r"}, {"d": 15, "u": 188.0, "c": "r"}]}, {"v": 20, "b": 300, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 1.5, "c": "o"}, {"d": 0.125, "u": 2.0, "c": "o"}, {"d": 0.15, "u": 2.5, "c": "o"}, {"d": 0.2, "u": 3.0, "c": "y"}, {"d": 0.25, "u": 4.0, "c": "y"}, {"d": 0.3, "u": 4.5, "c": "y"}, {"d": 0.4, "u": 6.0, "c": "g"}, {"d": 0.5, "u": 7.5, "c": "g"}, {"d": 0.6, "u": 9.0, "c": "g"}, {"d": 0.75, "u": 11.5, "c": "g"}, {"d": 0.9, "u": 13.5, "c": "g"}, {"d": 1, "u": 15.0, "c": "g"}, {"d": 1.25, "u": 19.0, "c": "g"}, {"d": 1.5, "u": 22.5, "c": "g"}, {"d": 1.75, "u": 26.5, "c": "g"}, {"d": 2, "u": 30.0, "c": "g"}, {"d": 2.5, "u": 37.5, "c": "y"}, {"d": 3, "u": 45.0, "c": "y"}, {"d": 4, "u": 60.0, "c": "o"}, {"d": 5, "u": 75.0, "c": "o"}, {"d": 6, "u": 90.0, "c": "o"}, {"d": 7.5, "u": 112.5, "c": "r"}, {"d": 8, "u": 120.0, "c": "r"}, {"d": 9, "u": 135.0, "c": "r"}, {"d": 10, "u": 150.0, "c": "r"}, {"d": 11, "u": 165.0, "c": "r"}, {"d": 12, "u": 180.0, "c": "r"}, {"d": 12.5, "u": 187.5, "c": "r"}, {"d": 13, "u": 195.0, "c": "r"}, {"d": 14, "u": 210.0, "c": "r"}, {"d": 15, "u": 225.0, "c": "r"}]}, {"v": 20, "b": 400, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 2.0, "c": "o"}, {"d": 0.125, "u": 2.5, "c": "o"}, {"d": 0.15, "u": 3.0, "c": "y"}, {"d": 0.2, "u": 4.0, "c": "y"}, {"d": 0.25, "u": 5.0, "c": "g"}, {"d": 0.3, "u": 6.0, "c": "g"}, {"d": 0.4, "u": 8.0, "c": "g"}, {"d": 0.5, "u": 10.0, "c": "g"}, {"d": 0.6, "u": 12.0, "c": "g"}, {"d": 0.75, "u": 15.0, "c": "g"}, {"d": 0.9, "u": 18.0, "c": "g"}, {"d": 1, "u": 20.0, "c": "g"}, {"d": 1.25, "u": 25.0, "c": "g"}, {"d": 1.5, "u": 30.0, "c": "g"}, {"d": 1.75, "u": 35.0, "c": "y"}, {"d": 2, "u": 40.0, "c": "y"}, {"d": 2.5, "u": 50.0, "c": "y"}, {"d": 3, "u": 60.0, "c": "o"}, {"d": 4, "u": 80.0, "c": "o"}, {"d": 5, "u": 100.0, "c": "o"}, {"d": 6, "u": 120.0, "c": "r"}, {"d": 7.5, "u": 150.0, "c": "r"}, {"d": 8, "u": 160.0, "c": "r"}, {"d": 9, "u": 180.0, "c": "r"}, {"d": 10, "u": 200.0, "c": "r"}, {"d": 11, "u": 220.0, "c": "r"}, {"d": 12, "u": 240.0, "c": "r"}, {"d": 12.5, "u": 250.0, "c": "r"}, {"d": 13, "u": 260.0, "c": "r"}, {"d": 14, "u": 280.0, "c": "r"}, {"d": 15, "u": 300.0, "c": "r"}]}, {"v": 20, "b": 500, "cells": [{"d": 0.05, "u": 2.0, "c": "o"}, {"d": 0.1, "u": 2.5, "c": "o"}, {"d": 0.125, "u": 3.0, "c": "y"}, {"d": 0.15, "u": 4.0, "c": "y"}, {"d": 0.2, "u": 5.0, "c": "g"}, {"d": 0.25, "u": 7.0, "c": "g"}, {"d": 0.3, "u": 8.0, "c": "g"}, {"d": 0.4, "u": 10.0, "c": "g"}, {"d": 0.5, "u": 13.0, "c": "g"}, {"d": 0.6, "u": 15.0, "c": "g"}, {"d": 0.75, "u": 19.0, "c": "g"}, {"d": 0.9, "u": 23.0, "c": "g"}, {"d": 1, "u": 25.0, "c": "g"}, {"d": 1.25, "u": 32.0, "c": "y"}, {"d": 1.5, "u": 38.0, "c": "y"}, {"d": 1.75, "u": 44.0, "c": "y"}, {"d": 2, "u": 50.0, "c": "y"}, {"d": 2.5, "u": 63.0, "c": "o"}, {"d": 3, "u": 75.0, "c": "o"}, {"d": 4, "u": 100.0, "c": "o"}, {"d": 5, "u": 125.0, "c": "r"}, {"d": 6, "u": 150.0, "c": "r"}, {"d": 7.5, "u": 188.0, "c": "r"}, {"d": 8, "u": 200.0, "c": "r"}, {"d": 9, "u": 225.0, "c": "r"}, {"d": 10, "u": 250.0, "c": "r"}, {"d": 11, "u": 275.0, "c": "r"}, {"d": 12, "u": 300.0, "c": "r"}, {"d": 12.5, "u": 312.5, "c": "r"}, {"d": 13, "u": 325.0, "c": "r"}, {"d": 14, "u": 350.0, "c": "r"}, {"d": 15, "u": 375.0, "c": "r"}]}, {"v": 25, "b": 100, "cells": [{"d": 0.05, "u": 0.0, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 0.5, "c": "r"}, {"d": 0.15, "u": 0.5, "c": "r"}, {"d": 0.2, "u": 1.0, "c": "o"}, {"d": 0.25, "u": 1.0, "c": "o"}, {"d": 0.3, "u": 1.0, "c": "o"}, {"d": 0.4, "u": 1.5, "c": "o"}, {"d": 0.5, "u": 2.0, "c": "o"}, {"d": 0.6, "u": 2.5, "c": "o"}, {"d": 0.75, "u": 3.0, "c": "y"}, {"d": 0.9, "u": 3.5, "c": "y"}, {"d": 1, "u": 4.0, "c": "y"}, {"d": 1.25, "u": 5.0, "c": "g"}, {"d": 1.5, "u": 6.0, "c": "g"}, {"d": 1.75, "u": 7.0, "c": "g"}, {"d": 2, "u": 8.0, "c": "g"}, {"d": 2.5, "u": 10.0, "c": "g"}, {"d": 3, "u": 12.0, "c": "g"}, {"d": 4, "u": 16.0, "c": "g"}, {"d": 5, "u": 20.0, "c": "g"}, {"d": 6, "u": 24.0, "c": "g"}, {"d": 7.5, "u": 30.0, "c": "g"}, {"d": 8, "u": 32.0, "c": "y"}, {"d": 9, "u": 36.0, "c": "y"}, {"d": 10, "u": 40.0, "c": "y"}, {"d": 11, "u": 44.0, "c": "y"}, {"d": 12, "u": 48.0, "c": "y"}, {"d": 12.5, "u": 50.0, "c": "y"}, {"d": 13, "u": 52.0, "c": "o"}, {"d": 14, "u": 56.0, "c": "o"}, {"d": 15, "u": 60.0, "c": "o"}]}, {"v": 25, "b": 125, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 0.5, "c": "r"}, {"d": 0.15, "u": 1.0, "c": "o"}, {"d": 0.2, "u": 1.0, "c": "o"}, {"d": 0.25, "u": 2.0, "c": "o"}, {"d": 0.3, "u": 1.5, "c": "o"}, {"d": 0.4, "u": 2.0, "c": "o"}, {"d": 0.5, "u": 3.0, "c": "y"}, {"d": 0.6, "u": 3.0, "c": "y"}, {"d": 0.75, "u": 4.0, "c": "y"}, {"d": 0.9, "u": 4.5, "c": "y"}, {"d": 1, "u": 5.0, "c": "g"}, {"d": 1.25, "u": 7.0, "c": "g"}, {"d": 1.5, "u": 8.0, "c": "g"}, {"d": 1.75, "u": 9.0, "c": "g"}, {"d": 2, "u": 10.0, "c": "g"}, {"d": 2.5, "u": 13.0, "c": "g"}, {"d": 3, "u": 15.0, "c": "g"}, {"d": 4, "u": 20.0, "c": "g"}, {"d": 5, "u": 25.0, "c": "g"}, {"d": 6, "u": 30.0, "c": "g"}, {"d": 7.5, "u": 38.0, "c": "y"}, {"d": 8, "u": 40.0, "c": "y"}, {"d": 9, "u": 45.0, "c": "y"}, {"d": 10, "u": 50.0, "c": "y"}, {"d": 11, "u": 55.0, "c": "o"}, {"d": 12, "u": 60.0, "c": "o"}, {"d": 12.5, "u": 62.5, "c": "o"}, {"d": 13, "u": 65.0, "c": "o"}, {"d": 14, "u": 70.0, "c": "o"}, {"d": 15, "u": 75.0, "c": "o"}]}, {"v": 25, "b": 150, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 1.0, "c": "o"}, {"d": 0.15, "u": 1.0, "c": "o"}, {"d": 0.2, "u": 1.0, "c": "o"}, {"d": 0.25, "u": 1.5, "c": "o"}, {"d": 0.3, "u": 2.0, "c": "o"}, {"d": 0.4, "u": 3.0, "c": "y"}, {"d": 0.5, "u": 3.0, "c": "y"}, {"d": 0.6, "u": 4.0, "c": "y"}, {"d": 0.75, "u": 4.5, "c": "y"}, {"d": 0.9, "u": 5.5, "c": "g"}, {"d": 1, "u": 6.0, "c": "g"}, {"d": 1.25, "u": 7.5, "c": "g"}, {"d": 1.5, "u": 9.0, "c": "g"}, {"d": 1.75, "u": 10.5, "c": "g"}, {"d": 2, "u": 12.0, "c": "g"}, {"d": 2.5, "u": 15.0, "c": "g"}, {"d": 3, "u": 18.0, "c": "g"}, {"d": 4, "u": 24.0, "c": "g"}, {"d": 5, "u": 30.0, "c": "g"}, {"d": 6, "u": 36.0, "c": "y"}, {"d": 7.5, "u": 45.0, "c": "y"}, {"d": 8, "u": 48.0, "c": "y"}, {"d": 9, "u": 54.0, "c": "o"}, {"d": 10, "u": 60.0, "c": "o"}, {"d": 11, "u": 66.0, "c": "o"}, {"d": 12, "u": 72.0, "c": "o"}, {"d": 12.5, "u": 75.0, "c": "o"}, {"d": 13, "u": 78.0, "c": "o"}, {"d": 14, "u": 84.0, "c": "o"}, {"d": 15, "u": 90.0, "c": "o"}]}, {"v": 25, "b": 200, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "o"}, {"d": 0.125, "u": 1.0, "c": "o"}, {"d": 0.15, "u": 1.0, "c": "o"}, {"d": 0.2, "u": 1.5, "c": "o"}, {"d": 0.25, "u": 2.0, "c": "o"}, {"d": 0.3, "u": 2.5, "c": "o"}, {"d": 0.4, "u": 3.0, "c": "y"}, {"d": 0.5, "u": 4.0, "c": "y"}, {"d": 0.6, "u": 5.0, "c": "g"}, {"d": 0.75, "u": 6.0, "c": "g"}, {"d": 0.9, "u": 7.0, "c": "g"}, {"d": 1, "u": 8.0, "c": "g"}, {"d": 1.25, "u": 10.0, "c": "g"}, {"d": 1.5, "u": 12.0, "c": "g"}, {"d": 1.75, "u": 14.0, "c": "g"}, {"d": 2, "u": 16.0, "c": "g"}, {"d": 2.5, "u": 20.0, "c": "g"}, {"d": 3, "u": 24.0, "c": "g"}, {"d": 4, "u": 32.0, "c": "y"}, {"d": 5, "u": 40.0, "c": "y"}, {"d": 6, "u": 48.0, "c": "y"}, {"d": 7.5, "u": 60.0, "c": "o"}, {"d": 8, "u": 64.0, "c": "o"}, {"d": 9, "u": 72.0, "c": "o"}, {"d": 10, "u": 80.0, "c": "o"}, {"d": 11, "u": 88.0, "c": "o"}, {"d": 12, "u": 96.0, "c": "o"}, {"d": 12.5, "u": 100.0, "c": "o"}, {"d": 13, "u": 104.0, "c": "r"}, {"d": 14, "u": 112.0, "c": "r"}, {"d": 15, "u": 120.0, "c": "r"}]}, {"v": 25, "b": 250, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "o"}, {"d": 0.125, "u": 2.0, "c": "o"}, {"d": 0.15, "u": 1.5, "c": "o"}, {"d": 0.2, "u": 2.0, "c": "o"}, {"d": 0.25, "u": 3.0, "c": "y"}, {"d": 0.3, "u": 3.0, "c": "y"}, {"d": 0.4, "u": 4.0, "c": "y"}, {"d": 0.5, "u": 5.0, "c": "g"}, {"d": 0.6, "u": 6.0, "c": "g"}, {"d": 0.75, "u": 8.0, "c": "g"}, {"d": 0.9, "u": 9.0, "c": "g"}, {"d": 1, "u": 10.0, "c": "g"}, {"d": 1.25, "u": 13.0, "c": "g"}, {"d": 1.5, "u": 15.0, "c": "g"}, {"d": 1.75, "u": 18.0, "c": "g"}, {"d": 2, "u": 20.0, "c": "g"}, {"d": 2.5, "u": 25.0, "c": "g"}, {"d": 3, "u": 30.0, "c": "g"}, {"d": 4, "u": 40.0, "c": "y"}, {"d": 5, "u": 50.0, "c": "y"}, {"d": 6, "u": 60.0, "c": "o"}, {"d": 7.5, "u": 75.0, "c": "o"}, {"d": 8, "u": 80.0, "c": "o"}, {"d": 9, "u": 90.0, "c": "o"}, {"d": 10, "u": 100.0, "c": "o"}, {"d": 11, "u": 110.0, "c": "r"}, {"d": 12, "u": 120.0, "c": "r"}, {"d": 12.5, "u": 125.0, "c": "r"}, {"d": 13, "u": 130.0, "c": "r"}, {"d": 14, "u": 140.0, "c": "r"}, {"d": 15, "u": 150.0, "c": "r"}]}, {"v": 25, "b": 300, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "o"}, {"d": 0.125, "u": 1.5, "c": "o"}, {"d": 0.15, "u": 2.0, "c": "o"}, {"d": 0.2, "u": 3.0, "c": "y"}, {"d": 0.25, "u": 3.0, "c": "y"}, {"d": 0.3, "u": 4.0, "c": "y"}, {"d": 0.4, "u": 5.0, "c": "g"}, {"d": 0.5, "u": 6.0, "c": "g"}, {"d": 0.6, "u": 7.0, "c": "g"}, {"d": 0.75, "u": 9.0, "c": "g"}, {"d": 0.9, "u": 11.0, "c": "g"}, {"d": 1, "u": 12.0, "c": "g"}, {"d": 1.25, "u": 15.0, "c": "g"}, {"d": 1.5, "u": 18.0, "c": "g"}, {"d": 1.75, "u": 21.0, "c": "g"}, {"d": 2, "u": 24.0, "c": "g"}, {"d": 2.5, "u": 30.0, "c": "g"}, {"d": 3, "u": 36.0, "c": "y"}, {"d": 4, "u": 48.0, "c": "y"}, {"d": 5, "u": 60.0, "c": "o"}, {"d": 6, "u": 72.0, "c": "o"}, {"d": 7.5, "u": 90.0, "c": "o"}, {"d": 8, "u": 96.0, "c": "o"}, {"d": 9, "u": 108.0, "c": "r"}, {"d": 10, "u": 120.0, "c": "r"}, {"d": 11, "u": 132.0, "c": "r"}, {"d": 12, "u": 144.0, "c": "r"}, {"d": 12.5, "u": 150.0, "c": "r"}, {"d": 13, "u": 156.0, "c": "r"}, {"d": 14, "u": 168.0, "c": "r"}, {"d": 15, "u": 180.0, "c": "r"}]}, {"v": 25, "b": 400, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 1.5, "c": "o"}, {"d": 0.125, "u": 2.0, "c": "o"}, {"d": 0.15, "u": 2.5, "c": "o"}, {"d": 0.2, "u": 3.0, "c": "y"}, {"d": 0.25, "u": 4.0, "c": "y"}, {"d": 0.3, "u": 5.0, "c": "g"}, {"d": 0.4, "u": 6.5, "c": "g"}, {"d": 0.5, "u": 8.0, "c": "g"}, {"d": 0.6, "u": 9.5, "c": "g"}, {"d": 0.75, "u": 12.0, "c": "g"}, {"d": 0.9, "u": 14.5, "c": "g"}, {"d": 1, "u": 16.0, "c": "g"}, {"d": 1.25, "u": 20.0, "c": "g"}, {"d": 1.5, "u": 24.0, "c": "g"}, {"d": 1.75, "u": 28.0, "c": "g"}, {"d": 2, "u": 32.0, "c": "y"}, {"d": 2.5, "u": 40.0, "c": "y"}, {"d": 3, "u": 48.0, "c": "y"}, {"d": 4, "u": 64.0, "c": "o"}, {"d": 5, "u": 80.0, "c": "o"}, {"d": 6, "u": 96.0, "c": "o"}, {"d": 7.5, "u": 120.0, "c": "r"}, {"d": 8, "u": 128.0, "c": "r"}, {"d": 9, "u": 144.0, "c": "r"}, {"d": 10, "u": 160.0, "c": "r"}, {"d": 11, "u": 176.0, "c": "r"}, {"d": 12, "u": 192.0, "c": "r"}, {"d": 12.5, "u": 200.0, "c": "r"}, {"d": 13, "u": 208.0, "c": "r"}, {"d": 14, "u": 224.0, "c": "r"}, {"d": 15, "u": 240.0, "c": "r"}]}, {"v": 25, "b": 500, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 2.0, "c": "o"}, {"d": 0.125, "u": 3.0, "c": "y"}, {"d": 0.15, "u": 3.0, "c": "y"}, {"d": 0.2, "u": 4.0, "c": "y"}, {"d": 0.25, "u": 5.0, "c": "g"}, {"d": 0.3, "u": 6.0, "c": "g"}, {"d": 0.4, "u": 8.0, "c": "g"}, {"d": 0.5, "u": 10.0, "c": "g"}, {"d": 0.6, "u": 12.0, "c": "g"}, {"d": 0.75, "u": 15.0, "c": "g"}, {"d": 0.9, "u": 18.0, "c": "g"}, {"d": 1, "u": 20.0, "c": "g"}, {"d": 1.25, "u": 25.0, "c": "g"}, {"d": 1.5, "u": 30.0, "c": "g"}, {"d": 1.75, "u": 35.0, "c": "y"}, {"d": 2, "u": 40.0, "c": "y"}, {"d": 2.5, "u": 50.0, "c": "y"}, {"d": 3, "u": 60.0, "c": "o"}, {"d": 4, "u": 80.0, "c": "o"}, {"d": 5, "u": 100.0, "c": "o"}, {"d": 6, "u": 120.0, "c": "r"}, {"d": 7.5, "u": 150.0, "c": "r"}, {"d": 8, "u": 160.0, "c": "r"}, {"d": 9, "u": 180.0, "c": "r"}, {"d": 10, "u": 200.0, "c": "r"}, {"d": 11, "u": 220.0, "c": "r"}, {"d": 12, "u": 240.0, "c": "r"}, {"d": 12.5, "u": 250.0, "c": "r"}, {"d": 13, "u": 260.0, "c": "r"}, {"d": 14, "u": 280.0, "c": "r"}, {"d": 15, "u": 300.0, "c": "r"}]}, {"v": 30, "b": 100, "cells": [{"d": 0.05, "u": 0.0, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 0.5, "c": "r"}, {"d": 0.15, "u": 0.5, "c": "r"}, {"d": 0.2, "u": 0.5, "c": "r"}, {"d": 0.25, "u": 1.0, "c": "o"}, {"d": 0.3, "u": 1.0, "c": "o"}, {"d": 0.4, "u": 1.5, "c": "o"}, {"d": 0.5, "u": 1.5, "c": "o"}, {"d": 0.6, "u": 2.0, "c": "o"}, {"d": 0.75, "u": 2.5, "c": "o"}, {"d": 0.9, "u": 3.0, "c": "y"}, {"d": 1, "u": 3.5, "c": "y"}, {"d": 1.25, "u": 4.0, "c": "y"}, {"d": 1.5, "u": 5.0, "c": "y"}, {"d": 1.75, "u": 6.0, "c": "y"}, {"d": 2, "u": 6.5, "c": "y"}, {"d": 2.5, "u": 8.5, "c": "y"}, {"d": 3, "u": 10.0, "c": "y"}, {"d": 4, "u": 13.5, "c": "y"}, {"d": 5, "u": 16.5, "c": "y"}, {"d": 6, "u": 20.0, "c": "y"}, {"d": 7.5, "u": 25.0, "c": "g"}, {"d": 8, "u": 26.5, "c": "g"}, {"d": 9, "u": 30.0, "c": "g"}, {"d": 10, "u": 33.5, "c": "g"}, {"d": 11, "u": 36.5, "c": "g"}, {"d": 12, "u": 40.0, "c": "g"}, {"d": 12.5, "u": 41.5, "c": "g"}, {"d": 13, "u": 43.5, "c": "g"}, {"d": 14, "u": 46.5, "c": "g"}, {"d": 15, "u": 50.0, "c": "g"}]}, {"v": 30, "b": 125, "cells": [{"d": 0.05, "u": 0.0, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 0.5, "c": "r"}, {"d": 0.15, "u": 0.5, "c": "r"}, {"d": 0.2, "u": 1.0, "c": "o"}, {"d": 0.25, "u": 1.0, "c": "o"}, {"d": 0.3, "u": 2.0, "c": "o"}, {"d": 0.4, "u": 1.5, "c": "o"}, {"d": 0.5, "u": 2.0, "c": "o"}, {"d": 0.6, "u": 3.0, "c": "y"}, {"d": 0.75, "u": 3.0, "c": "y"}, {"d": 0.9, "u": 4.0, "c": "y"}, {"d": 1, "u": 4.0, "c": "y"}, {"d": 1.25, "u": 5.0, "c": "g"}, {"d": 1.5, "u": 7.0, "c": "g"}, {"d": 1.75, "u": 7.5, "c": "g"}, {"d": 2, "u": 8.5, "c": "g"}, {"d": 2.5, "u": 10.5, "c": "g"}, {"d": 3, "u": 13.0, "c": "g"}, {"d": 4, "u": 16.5, "c": "g"}, {"d": 5, "u": 21.0, "c": "g"}, {"d": 6, "u": 25.0, "c": "g"}, {"d": 7.5, "u": 32.0, "c": "g"}, {"d": 8, "u": 33.5, "c": "g"}, {"d": 9, "u": 38.0, "c": "g"}, {"d": 10, "u": 41.5, "c": "g"}, {"d": 11, "u": 46.0, "c": "g"}, {"d": 12, "u": 50.0, "c": "g"}, {"d": 12.5, "u": 52.0, "c": "o"}, {"d": 13, "u": 54.0, "c": "o"}, {"d": 14, "u": 58.5, "c": "o"}, {"d": 15, "u": 63.0, "c": "o"}]}, {"v": 30, "b": 150, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 0.5, "c": "r"}, {"d": 0.15, "u": 1.0, "c": "o"}, {"d": 0.2, "u": 1.0, "c": "o"}, {"d": 0.25, "u": 1.5, "c": "o"}, {"d": 0.3, "u": 1.5, "c": "o"}, {"d": 0.4, "u": 2.0, "c": "o"}, {"d": 0.5, "u": 2.5, "c": "o"}, {"d": 0.6, "u": 3.0, "c": "y"}, {"d": 0.75, "u": 4.0, "c": "y"}, {"d": 0.9, "u": 4.5, "c": "y"}, {"d": 1, "u": 5.0, "c": "g"}, {"d": 1.25, "u": 6.5, "c": "g"}, {"d": 1.5, "u": 7.5, "c": "g"}, {"d": 1.75, "u": 9.0, "c": "g"}, {"d": 2, "u": 10.0, "c": "g"}, {"d": 2.5, "u": 12.5, "c": "g"}, {"d": 3, "u": 15.0, "c": "g"}, {"d": 4, "u": 20.0, "c": "g"}, {"d": 5, "u": 25.0, "c": "g"}, {"d": 6, "u": 30.0, "c": "g"}, {"d": 7.5, "u": 37.5, "c": "g"}, {"d": 8, "u": 40.0, "c": "g"}, {"d": 9, "u": 45.0, "c": "g"}, {"d": 10, "u": 50.0, "c": "g"}, {"d": 11, "u": 55.0, "c": "o"}, {"d": 12, "u": 60.0, "c": "o"}, {"d": 12.5, "u": 62.5, "c": "o"}, {"d": 13, "u": 65.0, "c": "o"}, {"d": 14, "u": 70.0, "c": "o"}, {"d": 15, "u": 75.0, "c": "o"}]}, {"v": 30, "b": 200, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 1.0, "c": "o"}, {"d": 0.15, "u": 1.0, "c": "o"}, {"d": 0.2, "u": 2.0, "c": "o"}, {"d": 0.25, "u": 1.5, "c": "o"}, {"d": 0.3, "u": 2.0, "c": "o"}, {"d": 0.4, "u": 3.0, "c": "y"}, {"d": 0.5, "u": 3.5, "c": "y"}, {"d": 0.6, "u": 4.0, "c": "y"}, {"d": 0.75, "u": 5.0, "c": "g"}, {"d": 0.9, "u": 6.0, "c": "g"}, {"d": 1, "u": 7.0, "c": "g"}, {"d": 1.25, "u": 8.5, "c": "g"}, {"d": 1.5, "u": 10.0, "c": "g"}, {"d": 1.75, "u": 11.5, "c": "g"}, {"d": 2, "u": 14.0, "c": "g"}, {"d": 2.5, "u": 16.5, "c": "g"}, {"d": 3, "u": 20.0, "c": "g"}, {"d": 4, "u": 27.0, "c": "g"}, {"d": 5, "u": 34.0, "c": "y"}, {"d": 6, "u": 40.0, "c": "y"}, {"d": 7.5, "u": 50.0, "c": "y"}, {"d": 8, "u": 54.0, "c": "o"}, {"d": 9, "u": 60.0, "c": "o"}, {"d": 10, "u": 67.0, "c": "o"}, {"d": 11, "u": 74.0, "c": "o"}, {"d": 12, "u": 80.0, "c": "o"}, {"d": 12.5, "u": 83.5, "c": "o"}, {"d": 13, "u": 87.0, "c": "o"}, {"d": 14, "u": 94.0, "c": "o"}, {"d": 15, "u": 100.0, "c": "o"}]}, {"v": 30, "b": 250, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "o"}, {"d": 0.125, "u": 1.0, "c": "o"}, {"d": 0.15, "u": 2.0, "c": "o"}, {"d": 0.2, "u": 1.5, "c": "o"}, {"d": 0.25, "u": 2.0, "c": "o"}, {"d": 0.3, "u": 3.0, "c": "y"}, {"d": 0.4, "u": 3.5, "c": "y"}, {"d": 0.5, "u": 4.0, "c": "y"}, {"d": 0.6, "u": 5.0, "c": "g"}, {"d": 0.75, "u": 7.0, "c": "g"}, {"d": 0.9, "u": 8.0, "c": "g"}, {"d": 1, "u": 8.5, "c": "g"}, {"d": 1.25, "u": 10.5, "c": "g"}, {"d": 1.5, "u": 13.0, "c": "g"}, {"d": 1.75, "u": 14.5, "c": "g"}, {"d": 2, "u": 16.5, "c": "g"}, {"d": 2.5, "u": 21.0, "c": "g"}, {"d": 3, "u": 25.0, "c": "g"}, {"d": 4, "u": 33.5, "c": "y"}, {"d": 5, "u": 41.5, "c": "y"}, {"d": 6, "u": 50.0, "c": "y"}, {"d": 7.5, "u": 63.0, "c": "o"}, {"d": 8, "u": 66.5, "c": "o"}, {"d": 9, "u": 75.0, "c": "o"}, {"d": 10, "u": 83.5, "c": "o"}, {"d": 11, "u": 91.5, "c": "o"}, {"d": 12, "u": 100.0, "c": "o"}, {"d": 12.5, "u": 104.0, "c": "r"}, {"d": 13, "u": 108.5, "c": "r"}, {"d": 14, "u": 116.5, "c": "r"}, {"d": 15, "u": 125.0, "c": "r"}]}, {"v": 30, "b": 300, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "o"}, {"d": 0.125, "u": 1.5, "c": "o"}, {"d": 0.15, "u": 1.5, "c": "o"}, {"d": 0.2, "u": 2.0, "c": "o"}, {"d": 0.25, "u": 2.5, "c": "o"}, {"d": 0.3, "u": 3.0, "c": "y"}, {"d": 0.4, "u": 4.0, "c": "y"}, {"d": 0.5, "u": 5.0, "c": "g"}, {"d": 0.6, "u": 6.0, "c": "g"}, {"d": 0.75, "u": 7.5, "c": "g"}, {"d": 0.9, "u": 9.0, "c": "g"}, {"d": 1, "u": 10.0, "c": "g"}, {"d": 1.25, "u": 12.5, "c": "g"}, {"d": 1.5, "u": 15.0, "c": "g"}, {"d": 1.75, "u": 17.5, "c": "g"}, {"d": 2, "u": 20.0, "c": "g"}, {"d": 2.5, "u": 25.0, "c": "g"}, {"d": 3, "u": 30.0, "c": "g"}, {"d": 4, "u": 40.0, "c": "y"}, {"d": 5, "u": 50.0, "c": "y"}, {"d": 6, "u": 60.0, "c": "o"}, {"d": 7.5, "u": 75.0, "c": "o"}, {"d": 8, "u": 80.0, "c": "o"}, {"d": 9, "u": 90.0, "c": "o"}, {"d": 10, "u": 100.0, "c": "o"}, {"d": 11, "u": 110.0, "c": "r"}, {"d": 12, "u": 120.0, "c": "r"}, {"d": 12.5, "u": 125.0, "c": "r"}, {"d": 13, "u": 130.0, "c": "r"}, {"d": 14, "u": 140.0, "c": "r"}, {"d": 15, "u": 150.0, "c": "r"}]}, {"v": 30, "b": 400, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 2.0, "c": "o"}, {"d": 0.125, "u": 1.5, "c": "o"}, {"d": 0.15, "u": 2.0, "c": "o"}, {"d": 0.2, "u": 3.0, "c": "y"}, {"d": 0.25, "u": 3.5, "c": "y"}, {"d": 0.3, "u": 4.0, "c": "y"}, {"d": 0.4, "u": 6.0, "c": "g"}, {"d": 0.5, "u": 7.0, "c": "g"}, {"d": 0.6, "u": 8.0, "c": "g"}, {"d": 0.75, "u": 10.0, "c": "g"}, {"d": 0.9, "u": 12.0, "c": "g"}, {"d": 1, "u": 14.0, "c": "g"}, {"d": 1.25, "u": 16.5, "c": "g"}, {"d": 1.5, "u": 20.0, "c": "g"}, {"d": 1.75, "u": 23.5, "c": "g"}, {"d": 2, "u": 27.0, "c": "g"}, {"d": 2.5, "u": 34.0, "c": "y"}, {"d": 3, "u": 40.0, "c": "y"}, {"d": 4, "u": 54.0, "c": "o"}, {"d": 5, "u": 67.0, "c": "o"}, {"d": 6, "u": 80.0, "c": "o"}, {"d": 7.5, "u": 100.0, "c": "o"}, {"d": 8, "u": 107.0, "c": "r"}, {"d": 9, "u": 120.0, "c": "r"}, {"d": 10, "u": 134.0, "c": "r"}, {"d": 11, "u": 147.0, "c": "r"}, {"d": 12, "u": 160.0, "c": "r"}, {"d": 12.5, "u": 166.5, "c": "r"}, {"d": 13, "u": 174.0, "c": "r"}, {"d": 14, "u": 187.0, "c": "r"}, {"d": 15, "u": 200.0, "c": "r"}]}, {"v": 30, "b": 500, "cells": [{"d": 0.05, "u": 1.0, "c": "o"}, {"d": 0.1, "u": 1.5, "c": "o"}, {"d": 0.125, "u": 2.0, "c": "o"}, {"d": 0.15, "u": 3.0, "c": "y"}, {"d": 0.2, "u": 3.5, "c": "y"}, {"d": 0.25, "u": 4.0, "c": "y"}, {"d": 0.3, "u": 5.0, "c": "g"}, {"d": 0.4, "u": 6.5, "c": "g"}, {"d": 0.5, "u": 8.5, "c": "g"}, {"d": 0.6, "u": 10.0, "c": "g"}, {"d": 0.75, "u": 13.0, "c": "g"}, {"d": 0.9, "u": 15.0, "c": "g"}, {"d": 1, "u": 16.5, "c": "g"}, {"d": 1.25, "u": 21.0, "c": "g"}, {"d": 1.5, "u": 25.0, "c": "g"}, {"d": 1.75, "u": 29.0, "c": "g"}, {"d": 2, "u": 33.5, "c": "y"}, {"d": 2.5, "u": 41.5, "c": "y"}, {"d": 3, "u": 50.0, "c": "y"}, {"d": 4, "u": 66.5, "c": "o"}, {"d": 5, "u": 83.5, "c": "o"}, {"d": 6, "u": 100.0, "c": "o"}, {"d": 7.5, "u": 125.0, "c": "r"}, {"d": 8, "u": 133.5, "c": "r"}, {"d": 9, "u": 150.0, "c": "r"}, {"d": 10, "u": 166.5, "c": "r"}, {"d": 11, "u": 183.5, "c": "r"}, {"d": 12, "u": 200.0, "c": "r"}, {"d": 12.5, "u": 208.5, "c": "r"}, {"d": 13, "u": 216.5, "c": "r"}, {"d": 14, "u": 233.5, "c": "r"}, {"d": 15, "u": 250.0, "c": "r"}]}, {"v": 35, "b": 100, "cells": [{"d": 0.05, "u": 0.0, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 0.5, "c": "r"}, {"d": 0.15, "u": 0.5, "c": "r"}, {"d": 0.2, "u": 0.5, "c": "r"}, {"d": 0.25, "u": 0.5, "c": "r"}, {"d": 0.3, "u": 1.0, "c": "r"}, {"d": 0.4, "u": 1.0, "c": "r"}, {"d": 0.5, "u": 1.5, "c": "r"}, {"d": 0.6, "u": 1.5, "c": "r"}, {"d": 0.75, "u": 2.0, "c": "r"}, {"d": 0.9, "u": 2.5, "c": "r"}, {"d": 1, "u": 3.0, "c": "y"}, {"d": 1.25, "u": 3.5, "c": "y"}, {"d": 1.5, "u": 4.5, "c": "y"}, {"d": 1.75, "u": 5.0, "c": "g"}, {"d": 2, "u": 5.5, "c": "g"}, {"d": 2.5, "u": 7.0, "c": "g"}, {"d": 3, "u": 8.5, "c": "g"}, {"d": 4, "u": 11.5, "c": "g"}, {"d": 5, "u": 14.5, "c": "g"}, {"d": 6, "u": 17.0, "c": "g"}, {"d": 7.5, "u": 21.5, "c": "g"}, {"d": 8, "u": 23.0, "c": "g"}, {"d": 9, "u": 25.5, "c": "g"}, {"d": 10, "u": 28.5, "c": "g"}, {"d": 11, "u": 31.5, "c": "y"}, {"d": 12, "u": 34.5, "c": "y"}, {"d": 12.5, "u": 35.5, "c": "y"}, {"d": 13, "u": 37.0, "c": "y"}, {"d": 14, "u": 40.0, "c": "y"}, {"d": 15, "u": 43.0, "c": "y"}]}, {"v": 35, "b": 140, "cells": [{"d": 0.05, "u": 0.0, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 0.5, "c": "r"}, {"d": 0.15, "u": 0.5, "c": "r"}, {"d": 0.2, "u": 1.0, "c": "r"}, {"d": 0.25, "u": 1.0, "c": "r"}, {"d": 0.3, "u": 1.0, "c": "r"}, {"d": 0.4, "u": 1.5, "c": "r"}, {"d": 0.5, "u": 2.0, "c": "r"}, {"d": 0.6, "u": 2.5, "c": "r"}, {"d": 0.75, "u": 3.0, "c": "y"}, {"d": 0.9, "u": 3.5, "c": "y"}, {"d": 1, "u": 4.0, "c": "y"}, {"d": 1.25, "u": 5.0, "c": "g"}, {"d": 1.5, "u": 6.0, "c": "g"}, {"d": 1.75, "u": 7.0, "c": "g"}, {"d": 2, "u": 8.0, "c": "g"}, {"d": 2.5, "u": 10.0, "c": "g"}, {"d": 3, "u": 12.0, "c": "g"}, {"d": 4, "u": 16.0, "c": "g"}, {"d": 5, "u": 20.0, "c": "g"}, {"d": 6, "u": 24.0, "c": "g"}, {"d": 7.5, "u": 30.0, "c": "g"}, {"d": 8, "u": 32.0, "c": "y"}, {"d": 9, "u": 36.0, "c": "y"}, {"d": 10, "u": 40.0, "c": "y"}, {"d": 11, "u": 44.0, "c": "y"}, {"d": 12, "u": 48.0, "c": "y"}, {"d": 12.5, "u": 50.0, "c": "y"}, {"d": 13, "u": 52.0, "c": "o"}, {"d": 14, "u": 56.0, "c": "o"}, {"d": 15, "u": 60.0, "c": "o"}]}, {"v": 35, "b": 200, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 0.5, "c": "r"}, {"d": 0.15, "u": 1.0, "c": "r"}, {"d": 0.2, "u": 1.0, "c": "r"}, {"d": 0.25, "u": 1.5, "c": "r"}, {"d": 0.3, "u": 1.5, "c": "r"}, {"d": 0.4, "u": 2.5, "c": "r"}, {"d": 0.5, "u": 3.0, "c": "y"}, {"d": 0.6, "u": 3.5, "c": "y"}, {"d": 0.75, "u": 4.5, "c": "y"}, {"d": 0.9, "u": 5.0, "c": "g"}, {"d": 1, "u": 5.5, "c": "g"}, {"d": 1.25, "u": 7.0, "c": "g"}, {"d": 1.5, "u": 8.5, "c": "g"}, {"d": 1.75, "u": 10.0, "c": "g"}, {"d": 2, "u": 11.5, "c": "g"}, {"d": 2.5, "u": 14.5, "c": "g"}, {"d": 3, "u": 17.0, "c": "g"}, {"d": 4, "u": 23.0, "c": "g"}, {"d": 5, "u": 28.5, "c": "g"}, {"d": 6, "u": 34.5, "c": "y"}, {"d": 7.5, "u": 43.0, "c": "y"}, {"d": 8, "u": 45.5, "c": "y"}, {"d": 9, "u": 51.5, "c": "o"}, {"d": 10, "u": 57.0, "c": "o"}, {"d": 11, "u": 63.0, "c": "o"}, {"d": 12, "u": 68.5, "c": "o"}, {"d": 12.5, "u": 71.5, "c": "o"}, {"d": 13, "u": 74.5, "c": "o"}, {"d": 14, "u": 80.0, "c": "o"}, {"d": 15, "u": 85.5, "c": "o"}]}, {"v": 35, "b": 280, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "r"}, {"d": 0.125, "u": 1.0, "c": "r"}, {"d": 0.15, "u": 1.0, "c": "r"}, {"d": 0.2, "u": 1.5, "c": "r"}, {"d": 0.25, "u": 2.0, "c": "r"}, {"d": 0.3, "u": 2.5, "c": "r"}, {"d": 0.4, "u": 3.0, "c": "y"}, {"d": 0.5, "u": 4.0, "c": "y"}, {"d": 0.6, "u": 5.0, "c": "g"}, {"d": 0.75, "u": 6.0, "c": "g"}, {"d": 0.9, "u": 7.0, "c": "g"}, {"d": 1, "u": 8.0, "c": "g"}, {"d": 1.25, "u": 10.0, "c": "g"}, {"d": 1.5, "u": 12.0, "c": "g"}, {"d": 1.75, "u": 14.0, "c": "g"}, {"d": 2, "u": 16.0, "c": "g"}, {"d": 2.5, "u": 20.0, "c": "g"}, {"d": 3, "u": 24.0, "c": "g"}, {"d": 4, "u": 32.0, "c": "y"}, {"d": 5, "u": 40.0, "c": "y"}, {"d": 6, "u": 48.0, "c": "y"}, {"d": 7.5, "u": 60.0, "c": "o"}, {"d": 8, "u": 64.0, "c": "o"}, {"d": 9, "u": 72.0, "c": "o"}, {"d": 10, "u": 80.0, "c": "o"}, {"d": 11, "u": 88.0, "c": "o"}, {"d": 12, "u": 96.0, "c": "o"}, {"d": 12.5, "u": 100.0, "c": "o"}, {"d": 13, "u": 104.0, "c": "r"}, {"d": 14, "u": 112.0, "c": "r"}, {"d": 15, "u": 120.0, "c": "r"}]}, {"v": 35, "b": 350, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "r"}, {"d": 0.125, "u": 1.5, "c": "r"}, {"d": 0.15, "u": 1.5, "c": "r"}, {"d": 0.2, "u": 2.0, "c": "r"}, {"d": 0.25, "u": 2.5, "c": "r"}, {"d": 0.3, "u": 3.0, "c": "y"}, {"d": 0.4, "u": 4.0, "c": "y"}, {"d": 0.5, "u": 5.0, "c": "g"}, {"d": 0.6, "u": 6.0, "c": "g"}, {"d": 0.75, "u": 7.5, "c": "g"}, {"d": 0.9, "u": 9.0, "c": "g"}, {"d": 1, "u": 10.0, "c": "g"}, {"d": 1.25, "u": 12.5, "c": "g"}, {"d": 1.5, "u": 15.0, "c": "g"}, {"d": 1.75, "u": 18.0, "c": "g"}, {"d": 2, "u": 20.0, "c": "g"}, {"d": 2.5, "u": 25.0, "c": "g"}, {"d": 3, "u": 30.0, "c": "g"}, {"d": 4, "u": 40.0, "c": "y"}, {"d": 5, "u": 50.0, "c": "y"}, {"d": 6, "u": 60.0, "c": "o"}, {"d": 7.5, "u": 75.0, "c": "o"}, {"d": 8, "u": 80.0, "c": "o"}, {"d": 9, "u": 90.0, "c": "o"}, {"d": 10, "u": 100.0, "c": "o"}, {"d": 11, "u": 110.0, "c": "r"}, {"d": 12, "u": 120.0, "c": "r"}, {"d": 12.5, "u": 125.0, "c": "r"}, {"d": 13, "u": 130.0, "c": "r"}, {"d": 14, "u": 140.0, "c": "r"}, {"d": 15, "u": 150.0, "c": "r"}]}, {"v": 35, "b": 420, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "r"}, {"d": 0.125, "u": 1.5, "c": "r"}, {"d": 0.15, "u": 2.0, "c": "r"}, {"d": 0.2, "u": 2.5, "c": "r"}, {"d": 0.25, "u": 3.0, "c": "y"}, {"d": 0.3, "u": 3.5, "c": "y"}, {"d": 0.4, "u": 5.0, "c": "g"}, {"d": 0.5, "u": 6.0, "c": "g"}, {"d": 0.6, "u": 7.0, "c": "g"}, {"d": 0.75, "u": 9.0, "c": "g"}, {"d": 0.9, "u": 11.0, "c": "g"}, {"d": 1, "u": 12.0, "c": "g"}, {"d": 1.25, "u": 15.0, "c": "g"}, {"d": 1.5, "u": 18.0, "c": "g"}, {"d": 1.75, "u": 21.0, "c": "g"}, {"d": 2, "u": 24.0, "c": "g"}, {"d": 2.5, "u": 30.0, "c": "g"}, {"d": 3, "u": 36.0, "c": "y"}, {"d": 4, "u": 48.0, "c": "y"}, {"d": 5, "u": 60.0, "c": "o"}, {"d": 6, "u": 72.0, "c": "o"}, {"d": 7.5, "u": 90.0, "c": "o"}, {"d": 8, "u": 96.0, "c": "o"}, {"d": 9, "u": 108.0, "c": "o"}, {"d": 10, "u": 120.0, "c": "o"}, {"d": 11, "u": 132.0, "c": "r"}, {"d": 12, "u": 144.0, "c": "r"}, {"d": 12.5, "u": 150.0, "c": "r"}, {"d": 13, "u": 156.0, "c": "r"}, {"d": 14, "u": 168.0, "c": "r"}, {"d": 15, "u": 180.0, "c": "r"}]}, {"v": 35, "b": 500, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.5, "c": "r"}, {"d": 0.125, "u": 2.0, "c": "r"}, {"d": 0.15, "u": 2.0, "c": "r"}, {"d": 0.2, "u": 3.0, "c": "y"}, {"d": 0.25, "u": 3.5, "c": "y"}, {"d": 0.3, "u": 4.5, "c": "y"}, {"d": 0.4, "u": 5.5, "c": "g"}, {"d": 0.5, "u": 7.0, "c": "g"}, {"d": 0.6, "u": 8.5, "c": "g"}, {"d": 0.75, "u": 10.5, "c": "g"}, {"d": 0.9, "u": 13.0, "c": "g"}, {"d": 1, "u": 14.5, "c": "g"}, {"d": 1.25, "u": 18.0, "c": "g"}, {"d": 1.5, "u": 21.5, "c": "g"}, {"d": 1.75, "u": 25.0, "c": "g"}, {"d": 2, "u": 28.5, "c": "g"}, {"d": 2.5, "u": 35.5, "c": "y"}, {"d": 3, "u": 43.0, "c": "y"}, {"d": 4, "u": 57.0, "c": "o"}, {"d": 5, "u": 71.5, "c": "o"}, {"d": 6, "u": 85.5, "c": "o"}, {"d": 7.5, "u": 107.0, "c": "r"}, {"d": 8, "u": 114.5, "c": "r"}, {"d": 9, "u": 128.5, "c": "r"}, {"d": 10, "u": 143.0, "c": "r"}, {"d": 11, "u": 157.0, "c": "r"}, {"d": 12, "u": 171.5, "c": "r"}, {"d": 12.5, "u": 178.5, "c": "r"}, {"d": 13, "u": 185.5, "c": "r"}, {"d": 14, "u": 200.0, "c": "r"}, {"d": 15, "u": 214.5, "c": "r"}]}, {"v": 40, "b": 200, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 0.5, "c": "r"}, {"d": 0.15, "u": 1.0, "c": "r"}, {"d": 0.2, "u": 1.0, "c": "r"}, {"d": 0.25, "u": 1.5, "c": "r"}, {"d": 0.3, "u": 1.5, "c": "r"}, {"d": 0.4, "u": 2.0, "c": "r"}, {"d": 0.5, "u": 2.5, "c": "r"}, {"d": 0.6, "u": 3.0, "c": "o"}, {"d": 0.75, "u": 4.0, "c": "o"}, {"d": 0.9, "u": 4.5, "c": "o"}, {"d": 1, "u": 5.0, "c": "y"}, {"d": 1.25, "u": 6.5, "c": "y"}, {"d": 1.5, "u": 7.5, "c": "y"}, {"d": 1.75, "u": 9.0, "c": "y"}, {"d": 2, "u": 10.0, "c": "g"}, {"d": 2.5, "u": 12.5, "c": "g"}, {"d": 3, "u": 15.0, "c": "g"}, {"d": 4, "u": 20.0, "c": "g"}, {"d": 5, "u": 25.0, "c": "g"}, {"d": 6, "u": 30.0, "c": "g"}, {"d": 7.5, "u": 37.5, "c": "g"}, {"d": 8, "u": 40.0, "c": "g"}, {"d": 9, "u": 45.0, "c": "g"}, {"d": 10, "u": 50.0, "c": "g"}, {"d": 11, "u": 55.0, "c": "o"}, {"d": 12, "u": 60.0, "c": "o"}, {"d": 12.5, "u": 62.5, "c": "o"}, {"d": 13, "u": 65.0, "c": "o"}, {"d": 14, "u": 70.0, "c": "o"}, {"d": 15, "u": 75.0, "c": "o"}]}, {"v": 40, "b": 250, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 1.0, "c": "r"}, {"d": 0.15, "u": 1.0, "c": "r"}, {"d": 0.2, "u": 1.5, "c": "r"}, {"d": 0.25, "u": 1.5, "c": "r"}, {"d": 0.3, "u": 2.0, "c": "r"}, {"d": 0.4, "u": 3.0, "c": "o"}, {"d": 0.5, "u": 3.0, "c": "o"}, {"d": 0.6, "u": 4.0, "c": "o"}, {"d": 0.75, "u": 4.5, "c": "o"}, {"d": 0.9, "u": 5.5, "c": "y"}, {"d": 1, "u": 6.5, "c": "y"}, {"d": 1.25, "u": 8.0, "c": "y"}, {"d": 1.5, "u": 9.5, "c": "y"}, {"d": 1.75, "u": 11.0, "c": "g"}, {"d": 2, "u": 13.0, "c": "g"}, {"d": 2.5, "u": 15.5, "c": "g"}, {"d": 3, "u": 19.0, "c": "g"}, {"d": 4, "u": 25.0, "c": "g"}, {"d": 5, "u": 31.5, "c": "g"}, {"d": 6, "u": 38.0, "c": "g"}, {"d": 7.5, "u": 47.0, "c": "g"}, {"d": 8, "u": 50.0, "c": "g"}, {"d": 9, "u": 56.5, "c": "o"}, {"d": 10, "u": 63.0, "c": "o"}, {"d": 11, "u": 69.0, "c": "o"}, {"d": 12, "u": 75.0, "c": "o"}, {"d": 12.5, "u": 78.0, "c": "o"}, {"d": 13, "u": 82.0, "c": "o"}, {"d": 14, "u": 88.0, "c": "o"}, {"d": 15, "u": 94.0, "c": "o"}]}, {"v": 40, "b": 300, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "r"}, {"d": 0.125, "u": 1.0, "c": "r"}, {"d": 0.15, "u": 1.0, "c": "r"}, {"d": 0.2, "u": 1.5, "c": "r"}, {"d": 0.25, "u": 2.0, "c": "r"}, {"d": 0.3, "u": 2.5, "c": "r"}, {"d": 0.4, "u": 3.0, "c": "o"}, {"d": 0.5, "u": 4.0, "c": "o"}, {"d": 0.6, "u": 4.5, "c": "o"}, {"d": 0.75, "u": 5.5, "c": "y"}, {"d": 0.9, "u": 7.0, "c": "y"}, {"d": 1, "u": 7.5, "c": "y"}, {"d": 1.25, "u": 9.5, "c": "y"}, {"d": 1.5, "u": 11.5, "c": "g"}, {"d": 1.75, "u": 13.0, "c": "g"}, {"d": 2, "u": 15.0, "c": "g"}, {"d": 2.5, "u": 19.0, "c": "g"}, {"d": 3, "u": 22.5, "c": "g"}, {"d": 4, "u": 30.0, "c": "g"}, {"d": 5, "u": 37.5, "c": "g"}, {"d": 6, "u": 45.0, "c": "g"}, {"d": 7.5, "u": 56.5, "c": "o"}, {"d": 8, "u": 60.0, "c": "o"}, {"d": 9, "u": 67.5, "c": "o"}, {"d": 10, "u": 75.0, "c": "o"}, {"d": 11, "u": 82.5, "c": "o"}, {"d": 12, "u": 90.0, "c": "o"}, {"d": 12.5, "u": 94.0, "c": "o"}, {"d": 13, "u": 97.5, "c": "o"}, {"d": 14, "u": 105.0, "c": "r"}, {"d": 15, "u": 112.5, "c": "r"}]}, {"v": 40, "b": 400, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "r"}, {"d": 0.125, "u": 1.5, "c": "r"}, {"d": 0.15, "u": 1.5, "c": "r"}, {"d": 0.2, "u": 2.0, "c": "r"}, {"d": 0.25, "u": 2.5, "c": "r"}, {"d": 0.3, "u": 3.0, "c": "o"}, {"d": 0.4, "u": 4.0, "c": "o"}, {"d": 0.5, "u": 5.0, "c": "y"}, {"d": 0.6, "u": 6.0, "c": "y"}, {"d": 0.75, "u": 7.5, "c": "y"}, {"d": 0.9, "u": 9.0, "c": "y"}, {"d": 1, "u": 10.0, "c": "g"}, {"d": 1.25, "u": 12.5, "c": "g"}, {"d": 1.5, "u": 15.0, "c": "g"}, {"d": 1.75, "u": 17.5, "c": "g"}, {"d": 2, "u": 20.0, "c": "g"}, {"d": 2.5, "u": 25.0, "c": "g"}, {"d": 3, "u": 30.0, "c": "g"}, {"d": 4, "u": 40.0, "c": "g"}, {"d": 5, "u": 50.0, "c": "g"}, {"d": 6, "u": 60.0, "c": "o"}, {"d": 7.5, "u": 75.0, "c": "o"}, {"d": 8, "u": 80.0, "c": "o"}, {"d": 9, "u": 90.0, "c": "o"}, {"d": 10, "u": 100.0, "c": "o"}, {"d": 11, "u": 110.0, "c": "r"}, {"d": 12, "u": 120.0, "c": "r"}, {"d": 12.5, "u": 125.0, "c": "r"}, {"d": 13, "u": 130.0, "c": "r"}, {"d": 14, "u": 140.0, "c": "r"}, {"d": 15, "u": 150.0, "c": "r"}]}, {"v": 40, "b": 500, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.5, "c": "r"}, {"d": 0.125, "u": 1.5, "c": "r"}, {"d": 0.15, "u": 2.0, "c": "r"}, {"d": 0.2, "u": 3.0, "c": "o"}, {"d": 0.25, "u": 3.0, "c": "o"}, {"d": 0.3, "u": 4.0, "c": "o"}, {"d": 0.4, "u": 5.0, "c": "y"}, {"d": 0.5, "u": 6.5, "c": "y"}, {"d": 0.6, "u": 8.0, "c": "y"}, {"d": 0.75, "u": 9.5, "c": "y"}, {"d": 0.9, "u": 11.5, "c": "g"}, {"d": 1, "u": 13.0, "c": "g"}, {"d": 1.25, "u": 15.5, "c": "g"}, {"d": 1.5, "u": 19.0, "c": "g"}, {"d": 1.75, "u": 22.0, "c": "g"}, {"d": 2, "u": 25.0, "c": "g"}, {"d": 2.5, "u": 31.5, "c": "g"}, {"d": 3, "u": 38.0, "c": "g"}, {"d": 4, "u": 50.0, "c": "g"}, {"d": 5, "u": 63.0, "c": "o"}, {"d": 6, "u": 75.0, "c": "o"}, {"d": 7.5, "u": 94.0, "c": "o"}, {"d": 8, "u": 100.0, "c": "o"}, {"d": 9, "u": 113.0, "c": "r"}, {"d": 10, "u": 125.0, "c": "r"}, {"d": 11, "u": 138.0, "c": "r"}, {"d": 12, "u": 150.0, "c": "r"}, {"d": 12.5, "u": 156.5, "c": "r"}, {"d": 13, "u": 163.0, "c": "r"}, {"d": 14, "u": 175.0, "c": "r"}, {"d": 15, "u": 188.0, "c": "r"}]}, {"v": 50, "b": 200, "cells": [{"d": 0.05, "u": 0.0, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 0.5, "c": "r"}, {"d": 0.15, "u": 0.5, "c": "r"}, {"d": 0.2, "u": 1.0, "c": "r"}, {"d": 0.25, "u": 1.0, "c": "r"}, {"d": 0.3, "u": 1.0, "c": "r"}, {"d": 0.4, "u": 1.5, "c": "r"}, {"d": 0.5, "u": 2.0, "c": "r"}, {"d": 0.6, "u": 2.5, "c": "r"}, {"d": 0.75, "u": 3.0, "c": "o"}, {"d": 0.9, "u": 3.5, "c": "o"}, {"d": 1, "u": 4.0, "c": "o"}, {"d": 1.25, "u": 5.0, "c": "y"}, {"d": 1.5, "u": 6.0, "c": "y"}, {"d": 1.75, "u": 7.0, "c": "y"}, {"d": 2, "u": 8.0, "c": "y"}, {"d": 2.5, "u": 10.0, "c": "g"}, {"d": 3, "u": 12.0, "c": "g"}, {"d": 4, "u": 16.0, "c": "g"}, {"d": 5, "u": 20.0, "c": "g"}, {"d": 6, "u": 24.0, "c": "g"}, {"d": 7.5, "u": 30.0, "c": "g"}, {"d": 8, "u": 32.0, "c": "g"}, {"d": 9, "u": 36.0, "c": "g"}, {"d": 10, "u": 40.0, "c": "g"}, {"d": 11, "u": 44.0, "c": "g"}, {"d": 12, "u": 48.0, "c": "g"}, {"d": 12.5, "u": 50.0, "c": "g"}, {"d": 13, "u": 52.0, "c": "y"}, {"d": 14, "u": 56.0, "c": "y"}, {"d": 15, "u": 60.0, "c": "y"}]}, {"v": 50, "b": 250, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 0.5, "c": "r"}, {"d": 0.15, "u": 1.0, "c": "r"}, {"d": 0.2, "u": 1.0, "c": "r"}, {"d": 0.25, "u": 1.5, "c": "r"}, {"d": 0.3, "u": 1.5, "c": "r"}, {"d": 0.4, "u": 2.0, "c": "r"}, {"d": 0.5, "u": 3.0, "c": "o"}, {"d": 0.6, "u": 3.0, "c": "o"}, {"d": 0.75, "u": 4.0, "c": "o"}, {"d": 0.9, "u": 4.5, "c": "o"}, {"d": 1, "u": 5.0, "c": "y"}, {"d": 1.25, "u": 6.5, "c": "y"}, {"d": 1.5, "u": 8.0, "c": "y"}, {"d": 1.75, "u": 9.0, "c": "y"}, {"d": 2, "u": 10.0, "c": "g"}, {"d": 2.5, "u": 13.0, "c": "g"}, {"d": 3, "u": 15.0, "c": "g"}, {"d": 4, "u": 20.0, "c": "g"}, {"d": 5, "u": 25.0, "c": "g"}, {"d": 6, "u": 30.0, "c": "g"}, {"d": 7.5, "u": 38.0, "c": "g"}, {"d": 8, "u": 40.0, "c": "g"}, {"d": 9, "u": 45.0, "c": "g"}, {"d": 10, "u": 50.0, "c": "g"}, {"d": 11, "u": 55.0, "c": "y"}, {"d": 12, "u": 60.0, "c": "y"}, {"d": 12.5, "u": 62.5, "c": "y"}, {"d": 13, "u": 65.0, "c": "y"}, {"d": 14, "u": 70.0, "c": "y"}, {"d": 15, "u": 75.0, "c": "y"}]}, {"v": 50, "b": 300, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 1.0, "c": "r"}, {"d": 0.15, "u": 1.0, "c": "r"}, {"d": 0.2, "u": 1.0, "c": "r"}, {"d": 0.25, "u": 1.5, "c": "r"}, {"d": 0.3, "u": 2.0, "c": "r"}, {"d": 0.4, "u": 3.0, "c": "o"}, {"d": 0.5, "u": 3.0, "c": "o"}, {"d": 0.6, "u": 3.5, "c": "o"}, {"d": 0.75, "u": 4.5, "c": "o"}, {"d": 0.9, "u": 5.5, "c": "y"}, {"d": 1, "u": 6.0, "c": "y"}, {"d": 1.25, "u": 7.5, "c": "y"}, {"d": 1.5, "u": 9.0, "c": "y"}, {"d": 1.75, "u": 10.5, "c": "g"}, {"d": 2, "u": 12.0, "c": "g"}, {"d": 2.5, "u": 15.0, "c": "g"}, {"d": 3, "u": 18.0, "c": "g"}, {"d": 4, "u": 24.0, "c": "g"}, {"d": 5, "u": 30.0, "c": "g"}, {"d": 6, "u": 36.0, "c": "g"}, {"d": 7.5, "u": 45.0, "c": "g"}, {"d": 8, "u": 48.0, "c": "g"}, {"d": 9, "u": 54.0, "c": "y"}, {"d": 10, "u": 60.0, "c": "y"}, {"d": 11, "u": 66.0, "c": "y"}, {"d": 12, "u": 72.0, "c": "y"}, {"d": 12.5, "u": 75.0, "c": "y"}, {"d": 13, "u": 78.0, "c": "o"}, {"d": 14, "u": 84.0, "c": "o"}, {"d": 15, "u": 90.0, "c": "o"}]}, {"v": 50, "b": 400, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "r"}, {"d": 0.125, "u": 1.0, "c": "r"}, {"d": 0.15, "u": 1.0, "c": "r"}, {"d": 0.2, "u": 1.5, "c": "r"}, {"d": 0.25, "u": 2.0, "c": "r"}, {"d": 0.3, "u": 2.5, "c": "r"}, {"d": 0.4, "u": 3.0, "c": "o"}, {"d": 0.5, "u": 4.0, "c": "o"}, {"d": 0.6, "u": 5.0, "c": "o"}, {"d": 0.75, "u": 6.0, "c": "y"}, {"d": 0.9, "u": 7.0, "c": "y"}, {"d": 1, "u": 8.0, "c": "y"}, {"d": 1.25, "u": 10.0, "c": "g"}, {"d": 1.5, "u": 12.0, "c": "g"}, {"d": 1.75, "u": 14.0, "c": "g"}, {"d": 2, "u": 16.0, "c": "g"}, {"d": 2.5, "u": 20.0, "c": "g"}, {"d": 3, "u": 24.0, "c": "g"}, {"d": 4, "u": 32.0, "c": "g"}, {"d": 5, "u": 40.0, "c": "g"}, {"d": 6, "u": 48.0, "c": "g"}, {"d": 7.5, "u": 60.0, "c": "y"}, {"d": 8, "u": 64.0, "c": "y"}, {"d": 9, "u": 72.0, "c": "y"}, {"d": 10, "u": 80.0, "c": "o"}, {"d": 11, "u": 88.0, "c": "o"}, {"d": 12, "u": 96.0, "c": "o"}, {"d": 12.5, "u": 100.0, "c": "o"}, {"d": 13, "u": 104.0, "c": "r"}, {"d": 14, "u": 112.0, "c": "r"}, {"d": 15, "u": 120.0, "c": "r"}]}, {"v": 50, "b": 500, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "r"}, {"d": 0.125, "u": 1.5, "c": "r"}, {"d": 0.15, "u": 1.5, "c": "r"}, {"d": 0.2, "u": 2.0, "c": "r"}, {"d": 0.25, "u": 3.0, "c": "o"}, {"d": 0.3, "u": 3.0, "c": "o"}, {"d": 0.4, "u": 4.0, "c": "o"}, {"d": 0.5, "u": 5.0, "c": "y"}, {"d": 0.6, "u": 6.0, "c": "y"}, {"d": 0.75, "u": 8.0, "c": "y"}, {"d": 0.9, "u": 9.0, "c": "y"}, {"d": 1, "u": 10.0, "c": "g"}, {"d": 1.25, "u": 13.0, "c": "g"}, {"d": 1.5, "u": 15.0, "c": "g"}, {"d": 1.75, "u": 18.0, "c": "g"}, {"d": 2, "u": 20.0, "c": "g"}, {"d": 2.5, "u": 25.0, "c": "g"}, {"d": 3, "u": 30.0, "c": "g"}, {"d": 4, "u": 40.0, "c": "g"}, {"d": 5, "u": 50.0, "c": "g"}, {"d": 6, "u": 60.0, "c": "y"}, {"d": 7.5, "u": 75.0, "c": "y"}, {"d": 8, "u": 80.0, "c": "o"}, {"d": 9, "u": 90.0, "c": "o"}, {"d": 10, "u": 100.0, "c": "o"}, {"d": 11, "u": 110.0, "c": "r"}, {"d": 12, "u": 120.0, "c": "r"}, {"d": 12.5, "u": 125.0, "c": "r"}, {"d": 13, "u": 130.0, "c": "r"}, {"d": 14, "u": 140.0, "c": "r"}, {"d": 15, "u": 150.0, "c": "r"}]}, {"v": 60, "b": 200, "cells": [{"d": 0.05, "u": 0.0, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 0.5, "c": "r"}, {"d": 0.15, "u": 0.5, "c": "r"}, {"d": 0.2, "u": 0.5, "c": "r"}, {"d": 0.25, "u": 1.0, "c": "r"}, {"d": 0.3, "u": 1.0, "c": "r"}, {"d": 0.4, "u": 1.5, "c": "r"}, {"d": 0.5, "u": 1.5, "c": "r"}, {"d": 0.6, "u": 2.0, "c": "r"}, {"d": 0.75, "u": 2.5, "c": "o"}, {"d": 0.9, "u": 3.0, "c": "o"}, {"d": 1, "u": 3.5, "c": "o"}, {"d": 1.25, "u": 4.0, "c": "o"}, {"d": 1.5, "u": 5.0, "c": "y"}, {"d": 1.75, "u": 6.0, "c": "y"}, {"d": 2, "u": 6.5, "c": "y"}, {"d": 2.5, "u": 8.5, "c": "y"}, {"d": 3, "u": 10.0, "c": "g"}, {"d": 4, "u": 13.5, "c": "g"}, {"d": 5, "u": 16.5, "c": "g"}, {"d": 6, "u": 20.0, "c": "g"}, {"d": 7.5, "u": 25.0, "c": "g"}, {"d": 8, "u": 26.5, "c": "g"}, {"d": 9, "u": 30.0, "c": "g"}, {"d": 10, "u": 33.5, "c": "g"}, {"d": 11, "u": 36.5, "c": "g"}, {"d": 12, "u": 40.0, "c": "g"}, {"d": 12.5, "u": 41.5, "c": "g"}, {"d": 13, "u": 43.5, "c": "g"}, {"d": 14, "u": 46.5, "c": "g"}, {"d": 15, "u": 50.0, "c": "g"}]}, {"v": 60, "b": 300, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 0.5, "c": "r"}, {"d": 0.15, "u": 1.0, "c": "r"}, {"d": 0.2, "u": 1.0, "c": "r"}, {"d": 0.25, "u": 1.5, "c": "r"}, {"d": 0.3, "u": 1.5, "c": "r"}, {"d": 0.4, "u": 2.0, "c": "r"}, {"d": 0.5, "u": 2.5, "c": "r"}, {"d": 0.6, "u": 3.0, "c": "o"}, {"d": 0.75, "u": 4.0, "c": "o"}, {"d": 0.9, "u": 4.5, "c": "o"}, {"d": 1, "u": 5.0, "c": "y"}, {"d": 1.25, "u": 6.5, "c": "y"}, {"d": 1.5, "u": 7.5, "c": "y"}, {"d": 1.75, "u": 9.0, "c": "y"}, {"d": 2, "u": 10.0, "c": "g"}, {"d": 2.5, "u": 12.5, "c": "g"}, {"d": 3, "u": 15.0, "c": "g"}, {"d": 4, "u": 20.0, "c": "g"}, {"d": 5, "u": 25.0, "c": "g"}, {"d": 6, "u": 30.0, "c": "g"}, {"d": 7.5, "u": 37.5, "c": "g"}, {"d": 8, "u": 40.0, "c": "g"}, {"d": 9, "u": 45.0, "c": "g"}, {"d": 10, "u": 50.0, "c": "g"}, {"d": 11, "u": 55.0, "c": "y"}, {"d": 12, "u": 60.0, "c": "y"}, {"d": 12.5, "u": 62.5, "c": "y"}, {"d": 13, "u": 65.0, "c": "y"}, {"d": 14, "u": 70.0, "c": "y"}, {"d": 15, "u": 75.0, "c": "y"}]}, {"v": 60, "b": 400, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 0.5, "c": "r"}, {"d": 0.125, "u": 1.0, "c": "r"}, {"d": 0.15, "u": 1.0, "c": "r"}, {"d": 0.2, "u": 1.5, "c": "r"}, {"d": 0.25, "u": 1.5, "c": "r"}, {"d": 0.3, "u": 2.0, "c": "r"}, {"d": 0.4, "u": 2.5, "c": "r"}, {"d": 0.5, "u": 3.5, "c": "o"}, {"d": 0.6, "u": 4.0, "c": "o"}, {"d": 0.75, "u": 5.0, "c": "y"}, {"d": 0.9, "u": 6.0, "c": "y"}, {"d": 1, "u": 6.5, "c": "y"}, {"d": 1.25, "u": 8.5, "c": "y"}, {"d": 1.5, "u": 10.0, "c": "g"}, {"d": 1.75, "u": 11.5, "c": "g"}, {"d": 2, "u": 13.5, "c": "g"}, {"d": 2.5, "u": 16.5, "c": "g"}, {"d": 3, "u": 20.0, "c": "g"}, {"d": 4, "u": 26.5, "c": "g"}, {"d": 5, "u": 33.5, "c": "g"}, {"d": 6, "u": 40.0, "c": "g"}, {"d": 7.5, "u": 50.0, "c": "g"}, {"d": 8, "u": 53.5, "c": "y"}, {"d": 9, "u": 60.0, "c": "y"}, {"d": 10, "u": 66.5, "c": "y"}, {"d": 11, "u": 73.5, "c": "y"}, {"d": 12, "u": 80.0, "c": "o"}, {"d": 12.5, "u": 83.5, "c": "o"}, {"d": 13, "u": 86.5, "c": "o"}, {"d": 14, "u": 93.5, "c": "o"}, {"d": 15, "u": 100.0, "c": "o"}]}, {"v": 60, "b": 500, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "r"}, {"d": 0.125, "u": 1.0, "c": "r"}, {"d": 0.15, "u": 1.5, "c": "r"}, {"d": 0.2, "u": 1.5, "c": "r"}, {"d": 0.25, "u": 2.0, "c": "r"}, {"d": 0.3, "u": 2.5, "c": "r"}, {"d": 0.4, "u": 3.5, "c": "o"}, {"d": 0.5, "u": 4.0, "c": "o"}, {"d": 0.6, "u": 5.0, "c": "y"}, {"d": 0.75, "u": 6.5, "c": "y"}, {"d": 0.9, "u": 7.5, "c": "y"}, {"d": 1, "u": 8.5, "c": "y"}, {"d": 1.25, "u": 10.5, "c": "g"}, {"d": 1.5, "u": 12.5, "c": "g"}, {"d": 1.75, "u": 14.5, "c": "g"}, {"d": 2, "u": 16.5, "c": "g"}, {"d": 2.5, "u": 21.0, "c": "g"}, {"d": 3, "u": 25.0, "c": "g"}, {"d": 4, "u": 33.5, "c": "g"}, {"d": 5, "u": 41.5, "c": "g"}, {"d": 6, "u": 50.0, "c": "g"}, {"d": 7.5, "u": 62.5, "c": "y"}, {"d": 8, "u": 66.5, "c": "y"}, {"d": 9, "u": 75.0, "c": "y"}, {"d": 10, "u": 83.5, "c": "o"}, {"d": 11, "u": 91.5, "c": "o"}, {"d": 12, "u": 100.0, "c": "o"}, {"d": 12.5, "u": 104.0, "c": "r"}, {"d": 13, "u": 108.5, "c": "r"}, {"d": 14, "u": 116.5, "c": "r"}, {"d": 15, "u": 125.0, "c": "r"}]}, {"v": 60, "b": 600, "cells": [{"d": 0.05, "u": 0.5, "c": "r"}, {"d": 0.1, "u": 1.0, "c": "r"}, {"d": 0.125, "u": 1.5, "c": "r"}, {"d": 0.15, "u": 1.5, "c": "r"}, {"d": 0.2, "u": 2.0, "c": "r"}, {"d": 0.25, "u": 2.5, "c": "r"}, {"d": 0.3, "u": 3.0, "c": "o"}, {"d": 0.4, "u": 4.0, "c": "o"}, {"d": 0.5, "u": 5.0, "c": "y"}, {"d": 0.6, "u": 6.0, "c": "y"}, {"d": 0.75, "u": 7.5, "c": "y"}, {"d": 0.9, "u": 9.0, "c": "y"}, {"d": 1, "u": 10.0, "c": "g"}, {"d": 1.25, "u": 12.5, "c": "g"}, {"d": 1.5, "u": 15.0, "c": "g"}, {"d": 1.75, "u": 17.5, "c": "g"}, {"d": 2, "u": 20.0, "c": "g"}, {"d": 2.5, "u": 25.0, "c": "g"}, {"d": 3, "u": 30.0, "c": "g"}, {"d": 4, "u": 40.0, "c": "g"}, {"d": 5, "u": 50.0, "c": "g"}, {"d": 6, "u": 60.0, "c": "y"}, {"d": 7.5, "u": 75.0, "c": "y"}, {"d": 8, "u": 80.0, "c": "o"}, {"d": 9, "u": 90.0, "c": "o"}, {"d": 10, "u": 100.0, "c": "o"}, {"d": 11, "u": 110.0, "c": "r"}, {"d": 12, "u": 120.0, "c": "r"}, {"d": 12.5, "u": 125.0, "c": "r"}, {"d": 13, "u": 130.0, "c": "r"}, {"d": 14, "u": 140.0, "c": "r"}, {"d": 15, "u": 150.0, "c": "r"}]}], "quirks": [{"vial": 6, "bac_units": 60, "dose": 0.125, "formula": 1.5, "pdf": 2.0}, {"vial": 6, "bac_units": 120, "dose": 0.125, "formula": 2.5, "pdf": 3.0}, {"vial": 20, "bac_units": 125, "dose": 0.2, "formula": 1.5, "pdf": 2.0}, {"vial": 20, "bac_units": 125, "dose": 0.4, "formula": 2.5, "pdf": 3.0}, {"vial": 20, "bac_units": 125, "dose": 1, "formula": 6.5, "pdf": 7.0}, {"vial": 20, "bac_units": 125, "dose": 2, "formula": 12.5, "pdf": 13.0}, {"vial": 20, "bac_units": 125, "dose": 5, "formula": 31.5, "pdf": 32.0}, {"vial": 20, "bac_units": 125, "dose": 6, "formula": 37.5, "pdf": 38.0}, {"vial": 20, "bac_units": 125, "dose": 9, "formula": 56.5, "pdf": 57.0}, {"vial": 20, "bac_units": 125, "dose": 10, "formula": 62.5, "pdf": 63.0}, {"vial": 20, "bac_units": 125, "dose": 13, "formula": 81.5, "pdf": 82.0}, {"vial": 20, "bac_units": 125, "dose": 14, "formula": 87.5, "pdf": 88.0}, {"vial": 20, "bac_units": 250, "dose": 0.1, "formula": 1.5, "pdf": 2.0}, {"vial": 20, "bac_units": 250, "dose": 0.2, "formula": 2.5, "pdf": 3.0}, {"vial": 20, "bac_units": 250, "dose": 0.5, "formula": 6.5, "pdf": 7.0}, {"vial": 20, "bac_units": 250, "dose": 0.6, "formula": 7.5, "pdf": 8.0}, {"vial": 20, "bac_units": 250, "dose": 0.9, "formula": 11.5, "pdf": 12.0}, {"vial": 20, "bac_units": 250, "dose": 1, "formula": 12.5, "pdf": 13.0}, {"vial": 20, "bac_units": 250, "dose": 2.5, "formula": 31.5, "pdf": 32.0}, {"vial": 20, "bac_units": 250, "dose": 3, "formula": 37.5, "pdf": 38.0}, {"vial": 20, "bac_units": 250, "dose": 5, "formula": 62.5, "pdf": 63.0}, {"vial": 20, "bac_units": 250, "dose": 9, "formula": 112.5, "pdf": 113.0}, {"vial": 20, "bac_units": 250, "dose": 11, "formula": 137.5, "pdf": 138.0}, {"vial": 20, "bac_units": 250, "dose": 13, "formula": 162.5, "pdf": 163.0}, {"vial": 20, "bac_units": 250, "dose": 15, "formula": 187.5, "pdf": 188.0}, {"vial": 20, "bac_units": 500, "dose": 0.05, "formula": 1.5, "pdf": 2.0}, {"vial": 20, "bac_units": 500, "dose": 0.25, "formula": 6.5, "pdf": 7.0}, {"vial": 20, "bac_units": 500, "dose": 0.3, "formula": 7.5, "pdf": 8.0}, {"vial": 20, "bac_units": 500, "dose": 0.5, "formula": 12.5, "pdf": 13.0}, {"vial": 20, "bac_units": 500, "dose": 0.9, "formula": 22.5, "pdf": 23.0}, {"vial": 20, "bac_units": 500, "dose": 1.25, "formula": 31.5, "pdf": 32.0}, {"vial": 20, "bac_units": 500, "dose": 1.5, "formula": 37.5, "pdf": 38.0}, {"vial": 20, "bac_units": 500, "dose": 2.5, "formula": 62.5, "pdf": 63.0}, {"vial": 20, "bac_units": 500, "dose": 7.5, "formula": 187.5, "pdf": 188.0}, {"vial": 25, "bac_units": 125, "dose": 0.25, "formula": 1.5, "pdf": 2.0}, {"vial": 25, "bac_units": 125, "dose": 0.5, "formula": 2.5, "pdf": 3.0}, {"vial": 25, "bac_units": 125, "dose": 1.25, "formula": 6.5, "pdf": 7.0}, {"vial": 25, "bac_units": 125, "dose": 1.5, "formula": 7.5, "pdf": 8.0}, {"vial": 25, "bac_units": 125, "dose": 2.5, "formula": 12.5, "pdf": 13.0}, {"vial": 25, "bac_units": 125, "dose": 7.5, "formula": 37.5, "pdf": 38.0}, {"vial": 25, "bac_units": 150, "dose": 0.4, "formula": 2.5, "pdf": 3.0}, {"vial": 25, "bac_units": 150, "dose": 0.6, "formula": 3.5, "pdf": 4.0}, {"vial": 25, "bac_units": 250, "dose": 0.125, "formula": 1.5, "pdf": 2.0}, {"vial": 25, "bac_units": 250, "dose": 0.25, "formula": 2.5, "pdf": 3.0}, {"vial": 25, "bac_units": 250, "dose": 0.75, "formula": 7.5, "pdf": 8.0}, {"vial": 25, "bac_units": 250, "dose": 1.25, "formula": 12.5, "pdf": 13.0}, {"vial": 25, "bac_units": 250, "dose": 1.75, "formula": 17.5, "pdf": 18.0}, {"vial": 25, "bac_units": 300, "dose": 0.2, "formula": 2.5, "pdf": 3.0}, {"vial": 25, "bac_units": 300, "dose": 0.3, "formula": 3.5, "pdf": 4.0}, {"vial": 25, "bac_units": 500, "dose": 0.125, "formula": 2.5, "pdf": 3.0}, {"vial": 30, "bac_units": 125, "dose": 0.3, "formula": 1.5, "pdf": 2.0}, {"vial": 30, "bac_units": 125, "dose": 0.6, "formula": 2.5, "pdf": 3.0}, {"vial": 30, "bac_units": 125, "dose": 1.5, "formula": 6.5, "pdf": 7.0}, {"vial": 30, "bac_units": 125, "dose": 3, "formula": 12.5, "pdf": 13.0}, {"vial": 30, "bac_units": 125, "dose": 7.5, "formula": 31.5, "pdf": 32.0}, {"vial": 30, "bac_units": 125, "dose": 9, "formula": 37.5, "pdf": 38.0}, {"vial": 30, "bac_units": 125, "dose": 15, "formula": 62.5, "pdf": 63.0}, {"vial": 30, "bac_units": 200, "dose": 0.2, "formula": 1.5, "pdf": 2.0}, {"vial": 30, "bac_units": 200, "dose": 0.4, "formula": 2.5, "pdf": 3.0}, {"vial": 30, "bac_units": 200, "dose": 1, "formula": 6.5, "pdf": 7.0}, {"vial": 30, "bac_units": 200, "dose": 2, "formula": 13.5, "pdf": 14.0}, {"vial": 30, "bac_units": 200, "dose": 4, "formula": 26.5, "pdf": 27.0}, {"vial": 30, "bac_units": 200, "dose": 5, "formula": 33.5, "pdf": 34.0}, {"vial": 30, "bac_units": 200, "dose": 8, "formula": 53.5, "pdf": 54.0}, {"vial": 30, "bac_units": 200, "dose": 10, "formula": 66.5, "pdf": 67.0}, {"vial": 30, "bac_units": 200, "dose": 11, "formula": 73.5, "pdf": 74.0}, {"vial": 30, "bac_units": 200, "dose": 13, "formula": 86.5, "pdf": 87.0}, {"vial": 30, "bac_units": 200, "dose": 14, "formula": 93.5, "pdf": 94.0}, {"vial": 30, "bac_units": 250, "dose": 0.15, "formula": 1.5, "pdf": 2.0}, {"vial": 30, "bac_units": 250, "dose": 0.3, "formula": 2.5, "pdf": 3.0}, {"vial": 30, "bac_units": 250, "dose": 0.75, "formula": 6.5, "pdf": 7.0}, {"vial": 30, "bac_units": 250, "dose": 0.9, "formula": 7.5, "pdf": 8.0}, {"vial": 30, "bac_units": 250, "dose": 1.5, "formula": 12.5, "pdf": 13.0}, {"vial": 30, "bac_units": 250, "dose": 7.5, "formula": 62.5, "pdf": 63.0}, {"vial": 30, "bac_units": 400, "dose": 0.1, "formula": 1.5, "pdf": 2.0}, {"vial": 30, "bac_units": 400, "dose": 0.2, "formula": 2.5, "pdf": 3.0}, {"vial": 30, "bac_units": 400, "dose": 0.4, "formula": 5.5, "pdf": 6.0}, {"vial": 30, "bac_units": 400, "dose": 0.5, "formula": 6.5, "pdf": 7.0}, {"vial": 30, "bac_units": 400, "dose": 1, "formula": 13.5, "pdf": 14.0}, {"vial": 30, "bac_units": 400, "dose": 2, "formula": 26.5, "pdf": 27.0}, {"vial": 30, "bac_units": 400, "dose": 2.5, "formula": 33.5, "pdf": 34.0}, {"vial": 30, "bac_units": 400, "dose": 4, "formula": 53.5, "pdf": 54.0}, {"vial": 30, "bac_units": 400, "dose": 5, "formula": 66.5, "pdf": 67.0}, {"vial": 30, "bac_units": 400, "dose": 8, "formula": 106.5, "pdf": 107.0}, {"vial": 30, "bac_units": 400, "dose": 10, "formula": 133.5, "pdf": 134.0}, {"vial": 30, "bac_units": 400, "dose": 11, "formula": 146.5, "pdf": 147.0}, {"vial": 30, "bac_units": 400, "dose": 13, "formula": 173.5, "pdf": 174.0}, {"vial": 30, "bac_units": 400, "dose": 14, "formula": 186.5, "pdf": 187.0}, {"vial": 30, "bac_units": 500, "dose": 0.15, "formula": 2.5, "pdf": 3.0}, {"vial": 30, "bac_units": 500, "dose": 0.75, "formula": 12.5, "pdf": 13.0}, {"vial": 35, "bac_units": 350, "dose": 1.75, "formula": 17.5, "pdf": 18.0}, {"vial": 40, "bac_units": 250, "dose": 0.4, "formula": 2.5, "pdf": 3.0}, {"vial": 40, "bac_units": 250, "dose": 2, "formula": 12.5, "pdf": 13.0}, {"vial": 40, "bac_units": 250, "dose": 6, "formula": 37.5, "pdf": 38.0}, {"vial": 40, "bac_units": 250, "dose": 10, "formula": 62.5, "pdf": 63.0}, {"vial": 40, "bac_units": 250, "dose": 13, "formula": 81.5, "pdf": 82.0}, {"vial": 40, "bac_units": 250, "dose": 14, "formula": 87.5, "pdf": 88.0}, {"vial": 40, "bac_units": 500, "dose": 0.2, "formula": 2.5, "pdf": 3.0}, {"vial": 40, "bac_units": 500, "dose": 0.6, "formula": 7.5, "pdf": 8.0}, {"vial": 40, "bac_units": 500, "dose": 1, "formula": 12.5, "pdf": 13.0}, {"vial": 40, "bac_units": 500, "dose": 3, "formula": 37.5, "pdf": 38.0}, {"vial": 40, "bac_units": 500, "dose": 5, "formula": 62.5, "pdf": 63.0}, {"vial": 40, "bac_units": 500, "dose": 9, "formula": 112.5, "pdf": 113.0}, {"vial": 40, "bac_units": 500, "dose": 11, "formula": 137.5, "pdf": 138.0}, {"vial": 40, "bac_units": 500, "dose": 13, "formula": 162.5, "pdf": 163.0}, {"vial": 40, "bac_units": 500, "dose": 15, "formula": 187.5, "pdf": 188.0}, {"vial": 50, "bac_units": 250, "dose": 0.5, "formula": 2.5, "pdf": 3.0}, {"vial": 50, "bac_units": 250, "dose": 1.5, "formula": 7.5, "pdf": 8.0}, {"vial": 50, "bac_units": 250, "dose": 2.5, "formula": 12.5, "pdf": 13.0}, {"vial": 50, "bac_units": 250, "dose": 7.5, "formula": 37.5, "pdf": 38.0}, {"vial": 50, "bac_units": 300, "dose": 0.4, "formula": 2.5, "pdf": 3.0}, {"vial": 50, "bac_units": 500, "dose": 0.25, "formula": 2.5, "pdf": 3.0}, {"vial": 50, "bac_units": 500, "dose": 0.75, "formula": 7.5, "pdf": 8.0}, {"vial": 50, "bac_units": 500, "dose": 1.25, "formula": 12.5, "pdf": 13.0}, {"vial": 50, "bac_units": 500, "dose": 1.75, "formula": 17.5, "pdf": 18.0}]};
+const TIERS = {g:['Ideal','g'], y:['Common range','y'], o:['Possible — not ideal','o'], r:['Avoid — do not use','r']};
+const VIALS = [...new Set(DATA.rows.map(r=>r.v))].sort((a,b)=>a-b);
+const $ = id => document.getElementById(id);
+let curVial = 5, curHl = null;
+
+/* ---------- toast + copy ---------- */
+let toastT;
+function toast(msg){
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('show'), 1600);
+}
+function copyText(s){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(s).then(()=>toast('Copied '+s)).catch(()=>fallbackCopy(s));
+  } else fallbackCopy(s);
+}
+function fallbackCopy(s){
+  const ta = document.createElement('textarea'); ta.value = s; document.body.appendChild(ta);
+  ta.select(); try{ document.execCommand('copy'); toast('Copied '+s);}catch(e){ toast(s); }
+  ta.remove();
+}
+
+/* ---------- chapter 2: vial table ---------- */
+function vialRows(v){ return DATA.rows.filter(r=>r.v===v); }
+function bacML(u){ return (u/100).toFixed(u%100?2:0).replace(/0+$/,'').replace(/\.$/,''); }
+function buildPills(el, list, cur, cb){
+  el.innerHTML='';
+  list.forEach(v=>{
+    const b=document.createElement('button');
+    b.className='pill'+(v===cur?' on':''); b.textContent=(v+'').replace('.0','')+' mg';
+    b.onclick=()=>cb(v); el.appendChild(b);
+  });
+}
+function renderVial(){
+  const rows = vialRows(curVial);
+  const doses = rows[0].cells.map(c=>c.d);
+  // dose jump options
+  const dj=$('doseJump'); const keep=dj.value;
+  dj.innerHTML='<option value="">— none —</option>'+doses.map(d=>`<option value="${d}">${d} mg</option>`).join('');
+  if(doses.includes(parseFloat(keep))) dj.value=keep;
+  // table
+  let h='<thead><tr><th class="rowhead">BAC water</th>'+doses.map((d,i)=>`<th data-col="${i}">${d}</th>`).join('')+'</tr></thead><tbody>';
+  rows.forEach(r=>{
+    const ml=(r.b/100), conc=(r.v/ml);
+    h+=`<tr><th class="rowhead"><span class="bac">${(+ml.toFixed(2))} mL <span style="color:var(--faint);font-weight:600">(${r.b}u)</span></span><br><span class="conc">${(+conc.toFixed(2))} mg/mL</span></th>`;
+    r.cells.forEach((c,i)=>{
+      h+=`<td class="c-${c.c}" data-col="${i}" data-dose="${c.d}" data-u="${c.u}" title="${c.d} mg dose → ${c.u} units (${TIERS[c.c][0]})">${c.u}</td>`;
+    });
+    h+='</tr>';
+  });
+  $('vialTable').innerHTML=h+'</tbody>';
+  $('vialCap').textContent=`${curVial} mg vial · ${rows.length} BAC volumes · doses ${doses[0]}–${doses[doses.length-1]} mg · values & colors exactly as printed in the source chart.`;
+  applyHl();
+  // cell click → copy
+  $('vialTable').querySelectorAll('td').forEach(td=>{
+    td.onclick=()=>copyText(td.dataset.u+' units');
+  });
+}
+function applyHl(){
+  document.querySelectorAll('#vialTable .hl').forEach(e=>e.classList.remove('hl'));
+  const v=$('doseJump').value; curHl=v===''?null:v;
+  if(curHl===null) return;
+  const colIdx=String(vialRows(curVial)[0].cells.findIndex(c=>String(c.d)===curHl));
+  document.querySelectorAll('#vialTable [data-col]').forEach(e=>{
+    if(e.dataset.col===colIdx) e.classList.add('hl');
+  });
+}
+
+/* ---------- chapter 3: draw finder ---------- */
+function renderFinderDoseOptions(){
+  const rows=vialRows(curVial);
+  const doses=rows[0].cells.map(c=>c.d);
+  $('finderDose').innerHTML=doses.map(d=>`<option value="${d}">${d} mg</option>`).join('');
+}
+function renderFinder(){
+  const dose=parseFloat($('finderDose').value);
+  const rows=vialRows(curVial);
+  const tierRank={g:0,y:1,o:2,r:3};
+  const items=rows.map(r=>{
+    const cell=r.cells.find(c=>c.d===dose);
+    const ml=r.b/100, conc=r.v/ml;
+    return {ml, b:r.b, conc, u:cell.u, t:cell.c};
+  }).sort((a,b)=>tierRank[a.t]-tierRank[b.t] || a.ml-b.ml);
+  const box=$('finderResults'); box.innerHTML='';
+  items.forEach((it,fi)=>{
+    const [label,cls]=TIERS[it.t];
+    const d=document.createElement('div'); d.className='frow';
+    d.style.setProperty('--gb', fadeGradient(TILE_GRADIENTS[(fi*5+7) % TILE_GRADIENTS.length]));
+    d.innerHTML=`<div class="tier"><span class="dot ${cls}"></span>${label}</div>
+      <div class="what"><b>${(+it.ml.toFixed(2))} mL</b> BAC water (${it.b} units)<small>${(+it.conc.toFixed(2))} mg/mL concentration</small></div>
+      <div class="units">${it.u} <small>units</small></div>
+      <button class="copy">copy</button>`;
+    d.onclick=()=>copyText(it.u+' units');
+    box.appendChild(d);
+  });
+}
+
+/* ---------- chapter 4: mini calculator ---------- */
+function calc(){
+  const v=parseFloat($('cVial').value), b=parseFloat($('cBac').value), d=parseFloat($('cDose').value);
+  if(!(v>0)||!(b>0)||!(d>=0)){ $('cOut').textContent='—'; return; }
+  const raw=d/v*(b*100);
+  const rounded=Math.round(raw*2)/2;
+  $('cOut').textContent=(+rounded.toFixed(1));
+}
+
+/* ---------- scrollspy ---------- */
+function spy(){
+  const links=[...document.querySelectorAll('#chapternav a')];
+  const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+  const obs=new IntersectionObserver(es=>{
+    es.forEach(e=>{ if(e.isIntersecting){
+      links.forEach(a=>a.classList.toggle('active', a.getAttribute('href')==='#'+e.target.id));
+    }});
+  },{rootMargin:'-40% 0px -55% 0px'});
+  secs.forEach(s=>s&&obs.observe(s));
+}
+
+/* ---------- tile gradient borders: blue-led, unique pair per tile ---------- */
+const TILE_GRADIENTS = [
+ 'linear-gradient(135deg,#1d4ed8,#7dd3fc99,#a78bfa99,#1e40af)',
+ 'linear-gradient(120deg,#2563eb,#5eead499,#f0abfc99,#1e3a8a)',
+ 'linear-gradient(150deg,#1e40af,#93c5fd99,#86efac99,#1d4ed8)',
+ 'linear-gradient(110deg,#1d4ed8,#fda4af99,#fcd34d99,#1e40af)',
+ 'linear-gradient(140deg,#2563eb,#67e8f999,#c4b5fd99,#1e3a8a)',
+ 'linear-gradient(125deg,#1e40af,#f9a8d499,#5eead499,#1d4ed8)',
+ 'linear-gradient(155deg,#1d4ed8,#fdba7499,#a5b4fc99,#1e40af)',
+ 'linear-gradient(115deg,#2563eb,#bef26499,#7dd3fc99,#1e3a8a)',
+ 'linear-gradient(145deg,#1e40af,#c4b5fd99,#67e8f999,#1d4ed8)',
+ 'linear-gradient(130deg,#1d4ed8,#86efac99,#93c5fd99,#1e40af)',
+ 'linear-gradient(100deg,#2563eb,#fda4af99,#5eead499,#1e3a8a)',
+ 'linear-gradient(160deg,#1e40af,#fcd34d99,#7dd3fc99,#1d4ed8)',
+ 'linear-gradient(135deg,#2563eb,#f0abfc99,#86efac99,#1e40af)',
+ 'linear-gradient(120deg,#1d4ed8,#93c5fd99,#fda4af99,#1e40af)',
+ 'linear-gradient(150deg,#2563eb,#5eead499,#fdba7499,#1e3a8a)',
+ 'linear-gradient(110deg,#1e40af,#a5b4fc99,#bef26499,#1d4ed8)',
+ 'linear-gradient(140deg,#1d4ed8,#67e8f999,#f9a8d499,#1e40af)',
+ 'linear-gradient(125deg,#2563eb,#fcd34d99,#c4b5fd99,#1e3a8a)',
+ 'linear-gradient(155deg,#1e40af,#7dd3fc99,#f0abfc99,#1d4ed8)',
+ 'linear-gradient(105deg,#1d4ed8,#86efac99,#fdba7499,#1e40af)',
+ 'linear-gradient(135deg,#1d4ed8,#38bdf899,#f472b699,#1e40af)'
+];
+const DOT_COLORS = ['#7dd3fc','#5eead4','#93c5fd','#fda4af','#67e8f9','#f9a8d4','#fdba74','#bef264','#c4b5fd','#86efac','#fda4af','#fcd34d','#f0abfc','#93c5fd','#5eead4','#a5b4fc','#67e8f9','#fcd34d','#7dd3fc','#86efac','#38bdf8'];
+/* soften a tile gradient for the draw finder: lower border opacity, keep it visible */
+const fadeGradient = g => g
+  .replace(/#([0-9a-fA-F]{6})99/g, '#$144')
+  .replace(/#([0-9a-fA-F]{6})(?![0-9a-fA-F])/g, '#$166');
+function paintTiles(){
+  const tiles = [
+    document.querySelector('.howto'),
+    ...document.querySelectorAll('#ch1 .grid.c2 .card'),
+    ...document.querySelectorAll('#ch1 .legend .leg'),
+    ...document.querySelectorAll('#ch4 .steps .step'),
+    ...document.querySelectorAll('#ch4 .card'),
+    ...document.querySelectorAll('#ch4 .note'),
+    ...document.querySelectorAll('#ch5 .note'),
+    document.querySelector('#quizCard')
+  ].filter(Boolean);
+  tiles.forEach((el,i)=>{
+    const gi = i % TILE_GRADIENTS.length;
+    el.style.setProperty('--gb', TILE_GRADIENTS[gi]);
+    el.style.setProperty('--dot', DOT_COLORS[gi]);
+    if(i < 5 || el.id === 'quizCard'){ /* how-to + four quick-ref cards + quiz */
+      el.classList.add('has-dot');
+      const s = document.createElement('span');
+      s.className = 'tile-dot';
+      s.setAttribute('aria-hidden','true');
+      el.prepend(s);
+    }
+  });
+}
+/* ---------- collapsible rating quiz ---------- */
+const QUIZ_KEY = 'recon-sheet-rating';
+const QUIZ_VOTES_KEY = 'recon-sheet-quiz-votes';
+const QUIZ_OPTS = [
+  {v:'4', icon:'⭐', label:'Excellent'},
+  {v:'3', icon:'👍', label:'Great'},
+  {v:'2', icon:'🙂', label:'Good'},
+  {v:'1', icon:'😐', label:"It's okay"}
+];
+function initQuiz(){
+  const card=$('quizCard'), toggle=$('quizToggle'),
+        opts=$('quizOptions'), thanks=$('quizThanks'),
+        results=$('quizResults'), qrTotal=$('qrTotal'), qrRows=$('qrRows');
+  if(!card||!toggle) return;
+  const setOpen = open => {
+    card.classList.toggle('open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+  };
+  toggle.onclick = () => setOpen(!card.classList.contains('open'));
+  const store = (k,v) => { try{ localStorage.setItem(k, v); }catch(e){} };
+  const readPick = () => { try{ return localStorage.getItem(QUIZ_KEY) || localStorage.getItem('recon-cheatsheet-rating'); }catch(e){ return null; } };
+  const readVotes = () => { try{ return JSON.parse(localStorage.getItem(QUIZ_VOTES_KEY)) || {}; }catch(e){ return {}; } };
+  function showThanks(v){
+    const opt = QUIZ_OPTS.find(o=>o.v===v);
+    const label = opt ? (opt.icon+' '+opt.label) : v;
+    thanks.hidden = false;
+    thanks.innerHTML = 'Thanks — you rated this sheet <strong>'+label+'</strong>.';
+  }
+  function renderResults(){
+    const votes = readVotes();
+    const total = QUIZ_OPTS.reduce((s,o)=>s+(+votes[o.v]||0),0);
+    if(!total){ results.hidden = true; return; }
+    qrTotal.textContent = total + (total===1 ? ' total vote' : ' total votes');
+    qrRows.innerHTML = QUIZ_OPTS.map(o=>{
+      const c = +votes[o.v] || 0;
+      const pct = Math.round(c/total*100);
+      return '<div class="qr-row"><span class="qr-label">'+o.icon+' '+o.label+'</span>'+
+        '<span class="qr-bar"><span style="width:'+pct+'%"></span></span>'+
+        '<span class="qr-pct">'+pct+'% · '+c+' vote'+(c===1?'':'s')+'</span></div>';
+    }).join('');
+    results.hidden = false;
+  }
+  function markPicked(v){
+    opts.querySelectorAll('button').forEach(x=>x.classList.toggle('picked', x.dataset.v===v));
+  }
+  opts.querySelectorAll('button').forEach(b=>{
+    b.onclick = ()=>{
+      const prev = readPick();
+      const votes = readVotes();
+      if(prev && prev!==b.dataset.v) votes[prev] = Math.max(0, (+votes[prev]||0) - 1);
+      if(prev!==b.dataset.v) votes[b.dataset.v] = (+votes[b.dataset.v]||0) + 1;
+      store(QUIZ_KEY, b.dataset.v);
+      store(QUIZ_VOTES_KEY, JSON.stringify(votes));
+      markPicked(b.dataset.v);
+      showThanks(b.dataset.v);
+      renderResults();
+    };
+  });
+  const saved = readPick();
+  if(saved){
+    markPicked(saved);
+    showThanks(saved);
+    renderResults();
+  }
+}
+/* ---------- scroll progress bar ---------- */
+function initProgress(){
+  const fill=$('progressFill'), sFill=$('sideFill'), sPct=$('sidePct');
+  let ticking=false;
+  function update(){
+    const h=document.documentElement;
+    const max=h.scrollHeight-h.clientHeight;
+    const pct=max>0?(h.scrollTop/max*100):0;
+    fill.style.width=pct+'%';
+    if(sFill) sFill.style.width=pct+'%';
+    if(sPct) sPct.textContent=Math.round(pct)+'%';
+    ticking=false;
+  }
+  window.addEventListener('scroll', ()=>{
+    if(!ticking){ ticking=true; requestAnimationFrame(update); }
+  }, {passive:true});
+  window.addEventListener('resize', update);
+  update();
+}
+/* ---------- light / dark theme toggle ---------- */
+function initTheme(){
+  const btn = $('themeBtn');
+  if(!btn) return;
+  const isLight = () => document.documentElement.getAttribute('data-theme') === 'light';
+  const paintIcon = () => {
+    btn.textContent = isLight() ? '☀️' : '🌙';
+    btn.setAttribute('aria-label', isLight() ? 'Switch to dark mode' : 'Switch to light mode');
+  };
+  btn.onclick = () => {
+    if(isLight()) document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', 'light');
+    try{ localStorage.setItem('recon-theme', isLight() ? 'light' : 'dark'); }catch(e){}
+    paintIcon();
+    btn.classList.add('dim'); /* stay out of the way after switching */
+  };
+  paintIcon();
+}
+/* ---------- init ---------- */
+const REDUCED_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* ---------- buttery sidebar scrolling: eased rAF glide, yields to manual input ---------- */
+let scrollAnim=null;
+function smoothScrollTo(target){
+  const doc=document.documentElement;
+  const startY=window.scrollY;
+  const endY=Math.max(0, target.getBoundingClientRect().top+startY-8);
+  const dist=endY-startY;
+  cancelAnimationFrame(scrollAnim);
+  if(REDUCED_MOTION || Math.abs(dist)<4){ window.scrollTo(0,endY); return; }
+  const prev=doc.style.scrollBehavior;
+  doc.style.scrollBehavior='auto'; /* keep CSS smoothing from fighting the rAF glide */
+  const dur=Math.min(1100, 420+Math.abs(dist)*0.32);
+  const t0=performance.now();
+  const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+  const cleanup=()=>{
+    window.removeEventListener('wheel', onUser);
+    window.removeEventListener('touchmove', onUser);
+    doc.style.scrollBehavior=prev;
+  };
+  const onUser=()=>{ cancelAnimationFrame(scrollAnim); cleanup(); };
+  window.addEventListener('wheel', onUser, {passive:true});
+  window.addEventListener('touchmove', onUser, {passive:true});
+  function frame(now){
+    const p=Math.min(1,(now-t0)/dur);
+    window.scrollTo(0, startY+dist*ease(p));
+    if(p<1){ scrollAnim=requestAnimationFrame(frame); }
+    else cleanup();
+  }
+  scrollAnim=requestAnimationFrame(frame);
+}
+/* ---------- top nav: JS-driven smooth scroll (robust where hash nav is blocked) ---------- */
+function initNav(){
+  document.querySelectorAll('#chapternav a').forEach(a=>{
+    a.addEventListener('click', e=>{
+      e.preventDefault();
+      const t = document.querySelector(a.getAttribute('href'));
+      if(t) smoothScrollTo(t);
+      try{ history.replaceState(null, '', a.getAttribute('href')); }catch(err){}
+    });
+  });
+}
+/* ---------- sidebar drawer (mobile) ---------- */
+function initSidebar(){
+  const btn=$('menuBtn'), bd=$('sideBackdrop');
+  if(!btn) return;
+  const close=()=>document.body.classList.remove('side-open');
+  btn.onclick=()=>document.body.classList.toggle('side-open');
+  if(bd) bd.onclick=close;
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') close(); });
+  document.querySelectorAll('#chapternav a').forEach(a=>a.addEventListener('click', ()=>{
+    if(window.innerWidth<=900) close();
+  }));
+}
+let swapTimer = null;
+function animatedVialSwitch(){
+  if(REDUCED_MOTION){ renderVial(); renderFinderDoseOptions(); renderFinder(); return; }
+  const wrap=$('vialTableWrap'), fres=$('finderResults');
+  wrap.classList.add('swapping'); fres.classList.add('swapping');
+  clearTimeout(swapTimer);
+  swapTimer=setTimeout(()=>{
+    renderVial(); renderFinderDoseOptions(); renderFinder();
+    void wrap.offsetWidth; /* restart the fade-in transition */
+    wrap.classList.remove('swapping'); fres.classList.remove('swapping');
+  },200);
+}
+function onVialPick(v){
+  if(v===curVial) return;
+  curVial=v; syncPills(); animatedVialSwitch();
+}
+function syncPills(){
+  buildPills($('vialPills'), VIALS, curVial, onVialPick);
+  buildPills($('finderPills'), VIALS, curVial, onVialPick);
+}
+syncPills();
+paintTiles();
+renderVial(); renderFinderDoseOptions(); renderFinder();
+initQuiz();
+initTheme();
+initProgress();
+initNav();
+initSidebar();
+$('doseJump').onchange=applyHl;
+$('clearHl').onclick=()=>{ $('doseJump').value=''; applyHl(); };
+$('finderDose').onchange=renderFinder;
+['cVial','cBac','cDose'].forEach(id=>$(id).addEventListener('input',calc));
+calc(); spy();
+</script>
+<script>
+/* ambient dot field — teal/cyan/deep-teal, slow drift + soft pulse */
+(function(){
+  const canvas = document.getElementById('bg-dots');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const COLORS = ['#2dd4bf','#22d3ee','#0f766e','#5eead4','#14b8a6'];
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let dots = [], W = 0, H = 0;
+  function spawn(){
+    const a = Math.random() * Math.PI * 2;
+    const sp = 0.10 + Math.random() * 0.26;
+    return {
+      x: Math.random() * W, y: Math.random() * H,
+      vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
+      r: 1 + Math.random() * 2.1,
+      c: COLORS[(Math.random() * COLORS.length) | 0],
+      o: 0.08 + Math.random() * 0.26,
+      ph: Math.random() * Math.PI * 2,
+      ps: 0.35 + Math.random() * 0.75
+    };
+  }
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    const n = Math.max(40, Math.min(150, Math.floor(W * H / 15000)));
+    dots = [];
+    for(let i = 0; i < n; i++) dots.push(spawn());
+  }
+  function tick(t){
+    ctx.clearRect(0, 0, W, H);
+    for(const d of dots){
+      d.x += d.vx; d.y += d.vy;
+      if(d.x < -12) d.x = W + 10; else if(d.x > W + 12) d.x = -10;
+      if(d.y < -12) d.y = H + 10; else if(d.y > H + 12) d.y = -10;
+      const pulse = 0.55 + 0.45 * Math.sin(t * 0.001 * d.ps + d.ph);
+      ctx.globalAlpha = d.o * pulse;
+      ctx.fillStyle = d.c;
+      ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, 6.2832); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    if(!reduce) requestAnimationFrame(tick);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
