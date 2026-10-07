@@ -363,6 +363,16 @@ code.k{font-family:ui-monospace,Menlo,Consolas,monospace; background:#ffffff12; 
 }
 /* pulsating status dot, top-left of a tile */
 .card,.leg,.step,.note,.frow{position:relative}
+/* back-to-top tile: same blue-led gradient border treatment as other tiles */
+.totop-wrap{display:flex; justify-content:center; margin:26px 0 8px}
+#toTopBtn{border:2px solid transparent; border-radius:14px;
+  background:linear-gradient(180deg,var(--card),var(--bg2)) padding-box,
+    linear-gradient(135deg,#2563eb,#7dd3fc,#a78bfa,#1e40af) border-box;
+  color:var(--text); font:inherit; font-weight:800; font-size:16px;
+  padding:16px 34px; cursor:pointer; display:inline-flex; align-items:center; gap:12px;
+  transition:transform .25s ease}
+#toTopBtn:hover{transform:translateY(-3px)}
+#toTopBtn .tt-arrow{width:36px; height:36px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#2563eb,#7dd3fc); color:#0a0f16; font-size:19px; font-weight:900; flex:0 0 auto}
 .tile-dot{
   position:absolute; top:13px; left:13px; width:7px; height:7px; border-radius:50%;
   background:var(--dot,#22d3ee);
@@ -580,6 +590,10 @@ footer p{max-width:90ch}
       </div>
     </div>
   </section>
+</div>
+
+<div class="totop-wrap">
+  <button id="toTopBtn" aria-label="Back to the top"><span class="tt-arrow">↑</span><span>Back to the top</span></button>
 </div>
 
 <footer>
@@ -897,6 +911,23 @@ function smoothScrollTo(target){
   }
   scrollAnim=requestAnimationFrame(frame);
 }
+/* ---------- back-to-top tile: smooth eased scroll to top ---------- */
+(function(){
+  const btn=$('toTopBtn'); if(!btn) return;
+  btn.addEventListener('click', ()=>{
+    const sy=window.scrollY||document.documentElement.scrollTop;
+    cancelAnimationFrame(scrollAnim);
+    if(REDUCED_MOTION || sy<4){ window.scrollTo(0,0); return; }
+    const dur=Math.min(1100, 420+sy*0.32), t0=performance.now();
+    const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+    function frame(now){
+      const p=Math.min(1,(now-t0)/dur);
+      window.scrollTo(0, sy*(1-ease(p)));
+      if(p<1) scrollAnim=requestAnimationFrame(frame);
+    }
+    scrollAnim=requestAnimationFrame(frame);
+  });
+})();
 /* ---------- top nav: JS-driven smooth scroll (robust where hash nav is blocked) ---------- */
 function initNav(){
   document.querySelectorAll('#chapternav a').forEach(a=>{
