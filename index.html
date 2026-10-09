@@ -28,6 +28,23 @@ body{
 }
 .wrap{max-width:1500px; margin:0 auto; padding:0 32px; position:relative; z-index:1}
 #bg-dots{position:fixed; inset:0; z-index:0; pointer-events:none}
+/* decorative background typography watermark */
+#bgtext{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.bgline{position:absolute;left:-25%;width:150%;transform:rotate(-20deg)}
+.bgtrack{display:inline-block;white-space:nowrap;animation:drift var(--spd,120s) linear infinite}
+.bgline.rev .bgtrack{animation-direction:reverse}
+.bgtrack b{font-family:inherit;font-weight:900;letter-spacing:.04em;color:transparent;
+  -webkit-text-stroke:1px var(--sc,rgba(34,211,238,.13))}
+.bgtrack i{font-style:normal;color:transparent;-webkit-text-stroke:1px rgba(159,176,198,.10);margin:0 .7em}
+.w1{--sc:rgba(34,211,238,.14)}
+.w2{--sc:rgba(165,243,252,.12)}
+@keyframes drift{to{transform:translateX(-50%)}}
+@media(max-width:900px){
+  .bgline.mhide{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .bgtrack{animation:none}
+}
 /* ---------- sidebar ---------- */
 .sidebar{
   position:fixed; top:0; left:0; bottom:0; width:248px; z-index:100;
@@ -398,6 +415,7 @@ footer p{max-width:90ch}
 <body>
 <div id="progress" aria-hidden="true"><div id="progressFill"></div></div>
 <canvas id="bg-dots" aria-hidden="true"></canvas>
+<div id="bgtext" aria-hidden="true"><div class="bgline" style="top:4%;font-size:6rem;--spd:138s"><div class="bgtrack"><span><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i></span><span aria-hidden="true"><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i></span></div></div><div class="bgline rev" style="top:22%;font-size:3.2rem;--spd:106s"><div class="bgtrack"><span><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i></span><span aria-hidden="true"><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i></span></div></div><div class="bgline" style="top:40%;font-size:7rem;--spd:162s"><div class="bgtrack"><span><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i></span><span aria-hidden="true"><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i></span></div></div><div class="bgline rev mhide" style="top:58%;font-size:2.8rem;--spd:119s"><div class="bgtrack"><span><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i></span><span aria-hidden="true"><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i></span></div></div><div class="bgline mhide" style="top:76%;font-size:6rem;--spd:150s"><div class="bgtrack"><span><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i></span><span aria-hidden="true"><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i></span></div></div><div class="bgline rev mhide" style="top:90%;font-size:3rem;--spd:100s"><div class="bgtrack"><span><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i></span><span aria-hidden="true"><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i><b class="w1">PUSHING</b><i>·</i><b class="w2">P</b><i>·</i></span></div></div></div>
 
 <aside class="sidebar" id="sidebar" aria-label="Site navigation">
   <div class="side-brand"><span class="drop">💧</span> Reconstitution Sheet</div>
